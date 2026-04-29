@@ -80,7 +80,7 @@ import { ShoppingBag, Search, User } from 'lucide-vue-next'
 
 const router = useRouter()
 
-defineProps({
+const props = defineProps({
   currentUser: {
     type: Object,
     default: null
@@ -93,12 +93,19 @@ const searchKeyword = ref('')
 const showDropdown = ref(false)
 let leaveTimer = null
 
-const navItems = [
+const baseNavItems = [
   { key: 'home', label: '首页', path: '/' },
   { key: 'publish', label: '发布商品', path: '/publish' },
-  { key: 'orders', label: '我的订单', path: '/orders' },
-  { key: 'admin', label: '管理后台', path: '/admin' }
+  { key: 'orders', label: '我的订单', path: '/orders' }
 ]
+
+const navItems = computed(() => {
+  const items = [...baseNavItems]
+  if (props.currentUser && props.currentUser.role === '管理员') {
+    items.push({ key: 'admin', label: '管理后台', path: '/admin' })
+  }
+  return items
+})
 
 const currentPath = computed(() => router.currentRoute.value.path)
 
