@@ -105,6 +105,7 @@ const tabs = [
 ]
 
 const userOrders = computed(() => {
+  if (!props.currentUser) return []
   const userId = props.currentUser.user_id
   return orders.filter(o => o.buyer_id === userId || o.seller_id === userId)
 })

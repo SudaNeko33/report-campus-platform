@@ -1,6 +1,11 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg shadow-lg p-8 mb-6 text-white">
+    <div v-if="!currentUser" class="bg-white rounded-lg shadow-sm p-12 text-center">
+      <User class="h-16 w-16 text-gray-300 mx-auto mb-4" />
+      <p class="text-gray-500">请先登录</p>
+    </div>
+    <template v-else>
+      <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg shadow-lg p-8 mb-6 text-white">
       <div class="flex items-center space-x-6">
         <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center">
           <User class="h-12 w-12 text-primary-600" />
@@ -122,6 +127,7 @@
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -133,13 +139,22 @@ import { users, goods, orders, comments } from '../data/mockData'
 const props = defineProps({
   currentUser: {
     type: Object,
-    required: true
+    default: null
   }
 })
 
-const myGoods = computed(() => goods.filter(g => g.user_id === props.currentUser.user_id))
-const myOrders = computed(() => orders.filter(o => o.buyer_id === props.currentUser.user_id || o.seller_id === props.currentUser.user_id))
-const myComments = computed(() => comments.filter(c => c.from_uid === props.currentUser.user_id))
+const myGoods = computed(() => {
+  if (!props.currentUser) return []
+  return goods.filter(g => g.user_id === props.currentUser.user_id)
+})
+const myOrders = computed(() => {
+  if (!props.currentUser) return []
+  return orders.filter(o => o.buyer_id === props.currentUser.user_id || o.seller_id === props.currentUser.user_id)
+})
+const myComments = computed(() => {
+  if (!props.currentUser) return []
+  return comments.filter(c => c.from_uid === props.currentUser.user_id)
+})
 
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
 

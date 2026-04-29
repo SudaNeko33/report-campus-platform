@@ -1,50 +1,19 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <Header 
-      v-if="currentPage !== 'login' && currentPage !== 'register'"
-      :currentPage="currentPage"
+      v-if="!isAuthPage"
       :currentUser="currentUser"
-      @navigate="handleNavigate"
       @search="handleSearch"
       @logout="handleLogout"
     />
     <main>
-      <LoginPage 
-        v-if="currentPage === 'login'" 
-        @navigate="handleNavigate"
-        @loginSuccess="handleLoginSuccess"
-      />
-      <RegisterPage 
-        v-else-if="currentPage === 'register'" 
-        @navigate="handleNavigate"
-        @registerSuccess="handleLoginSuccess"
-      />
-      <HomePage 
-        v-else-if="currentPage === 'home'" 
-        @viewGoods="viewGoods"
-      />
-      <GoodsDetail 
-        v-else-if="currentPage === 'detail'" 
-        :goods="selectedGoods"
-        @back="currentPage = 'home'"
-      />
-      <PublishPage 
-        v-else-if="currentPage === 'publish'" 
-        @back="currentPage = 'home'"
-      />
-      <OrdersPage 
-        v-else-if="currentPage === 'orders'" 
-        :currentUser="currentUser"
-      />
-      <ProfilePage 
-        v-else-if="currentPage === 'profile'" 
-        :currentUser="currentUser"
-      />
-      <AdminPage 
-        v-else-if="currentPage === 'admin'" 
-      />
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" :key="$route.fullPath" :currentUser="currentUser" />
+        </transition>
+      </router-view>
     </main>
-    <footer v-if="currentPage !== 'login' && currentPage !== 'register'" class="bg-white border-t border-gray-200 mt-8">
+    <footer v-if="!isAuthPage" class="bg-white border-t border-gray-200 mt-8">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex flex-col md:flex-row items-center justify-between">
           <div class="flex items-center space-x-2 mb-4 md:mb-0">
@@ -59,59 +28,42 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { ShoppingBag } from 'lucide-vue-next'
+import { useRouter } from 'vue-router'
 import Header from './components/Header.vue'
-import HomePage from './components/HomePage.vue'
-import GoodsDetail from './components/GoodsDetail.vue'
-import PublishPage from './components/PublishPage.vue'
-import OrdersPage from './components/OrdersPage.vue'
-import ProfilePage from './components/ProfilePage.vue'
-import AdminPage from './components/AdminPage.vue'
-import LoginPage from './components/LoginPage.vue'
-import RegisterPage from './components/RegisterPage.vue'
 import { useUser } from './composables/useUser'
 
+const router = useRouter()
 const { checkAuth, currentUser, logout } = useUser()
 
-const currentPage = ref('home')
-const selectedGoods = ref(null)
+const isAuthPage = computed(() => {
+  return ['login', 'register'].includes(router.currentRoute.value.name)
+})
 
 onMounted(() => {
   checkAuth()
 })
 
-const handleNavigate = (page) => {
-  if (page === 'admin') {
-    if (!currentUser.value) {
-      alert('请先登录！')
-      currentPage.value = 'login'
-      return
-    }
-    if (currentUser.value.role !== '管理员') {
-      alert('只有管理员才能访问管理后台！')
-      return
-    }
-  }
-  currentPage.value = page
-}
-
 const handleSearch = (keyword) => {
-  currentPage.value = 'home'
+  router.push('/')
   alert(`搜索：${keyword}`)
-}
-
-const viewGoods = (goods) => {
-  selectedGoods.value = goods
-  currentPage.value = 'detail'
-}
-
-const handleLoginSuccess = (user) => {
-  currentPage.value = 'home'
 }
 
 const handleLogout = () => {
   logout()
-  currentPage.value = 'login'
+  router.push('/login')
 }
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

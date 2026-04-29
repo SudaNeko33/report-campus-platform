@@ -8,9 +8,9 @@
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">登录账户</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           还没有账户？
-          <button @click="$emit('navigate', 'register')" class="font-medium text-primary-600 hover:text-primary-500">
+          <router-link to="/register" class="font-medium text-primary-600 hover:text-primary-500">
            立即注册
-          </button>
+          </router-link>
         </p>
       </div>
 
@@ -59,11 +59,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ShoppingBag } from 'lucide-vue-next'
 import { useUser } from '../composables/useUser'
 
-const emit = defineEmits(['navigate', 'loginSuccess'])
-
+const router = useRouter()
 const { login } = useUser()
 
 const username = ref('')
@@ -81,7 +81,7 @@ const handleLogin = () => {
   const result = login(username.value, password.value)
 
   if (result.success) {
-    emit('loginSuccess', result.user)
+    router.push('/')
   } else {
     errorMessage.value = result.message
   }

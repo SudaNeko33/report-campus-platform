@@ -1,10 +1,10 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <button @click="$emit('back')" class="flex items-center text-gray-600 hover:text-gray-900 mb-6">
+    <button @click="$router.back()" class="flex items-center text-gray-600 hover:text-gray-900 mb-6">
       <ArrowLeft class="h-5 w-5 mr-2" />
       返回列表
     </button>
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div v-if="goods" class="bg-white rounded-lg shadow-sm overflow-hidden">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-6">
         <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
           <img :src="goods.images" :alt="goods.goods_name" class="w-full h-full object-cover" />
@@ -75,25 +75,28 @@
         </div>
       </div>
     </div>
+    <div v-else class="bg-white rounded-lg shadow-sm p-12 text-center">
+      <p class="text-gray-500">商品不存在</p>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { ArrowLeft, User, Star, MessageCircle, ShoppingCart } from 'lucide-vue-next'
-import { categories, users } from '../data/mockData'
+import { goods as goodsData, categories, users } from '../data/mockData'
 
-const props = defineProps({
-  goods: {
-    type: Object,
-    required: true
-  }
+const route = useRoute()
+
+const goods = computed(() => {
+  const id = parseInt(route.params.id)
+  return goodsData.find(g => g.goods_id === id)
 })
 
-defineEmits(['back'])
-
 const statusClass = computed(() => {
-  switch (props.goods.status) {
+  if (!goods.value) return 'bg-gray-100 text-gray-700'
+  switch (goods.value.status) {
     case '待审核': return 'bg-yellow-100 text-yellow-700'
     case '已上架': return 'bg-green-100 text-green-700'
     case '已下架': return 'bg-gray-100 text-gray-700'
@@ -111,7 +114,7 @@ const getUserStudentId = (id) => users.find(u => u.user_id === id)?.student_id |
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
 
 const handleContact = () => {
-  const user = users.find(u => u.user_id === props.goods.user_id)
+  const user = users.find(u => u.user_id === goods.value.user_id)
   alert(`卖家联系方式：${user?.contact || '未提供'}`)
 }
 

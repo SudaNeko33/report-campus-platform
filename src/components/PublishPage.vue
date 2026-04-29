@@ -86,7 +86,7 @@
         <div class="flex space-x-4">
           <button 
             type="button"
-            @click="$emit('back')"
+            @click="$router.push('/')"
             class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             取消

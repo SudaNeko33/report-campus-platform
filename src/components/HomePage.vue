@@ -60,7 +60,7 @@
             v-for="good in filteredGoods" 
             :key="good.goods_id"
             class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-            @click="$emit('viewGoods', good)"
+            @click="$router.push(`/detail/${good.goods_id}`)"
           >
             <div class="aspect-square bg-gray-100">
               <img :src="good.images" :alt="good.goods_name" class="w-full h-full object-cover" />
@@ -94,8 +94,6 @@
 import { ref, computed } from 'vue'
 import { User, Star, Package } from 'lucide-vue-next'
 import { goods, categories, users, campusOptions } from '../data/mockData'
-
-defineEmits(['viewGoods'])
 
 const filterCategory = ref(null)
 const filterCampus = ref(null)

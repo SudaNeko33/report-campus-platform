@@ -1,0 +1,85 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import HomePage from '../components/HomePage.vue'
+import PublishPage from '../components/PublishPage.vue'
+import OrdersPage from '../components/OrdersPage.vue'
+import AdminPage from '../components/AdminPage.vue'
+import ProfilePage from '../components/ProfilePage.vue'
+import LoginPage from '../components/LoginPage.vue'
+import RegisterPage from '../components/RegisterPage.vue'
+import GoodsDetail from '../components/GoodsDetail.vue'
+import { useUser } from '../composables/useUser'
+
+const routes = [
+  {
+    path: '/',
+    name: 'home',
+    component: HomePage
+  },
+  {
+    path: '/publish',
+    name: 'publish',
+    component: PublishPage
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: OrdersPage
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminPage,
+    meta: { requiresAdmin: true }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: ProfilePage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginPage
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterPage
+  },
+  {
+    path: '/detail/:id',
+    name: 'detail',
+    component: GoodsDetail
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes
+})
+
+router.beforeEach((to, from, next) => {
+  const { currentUser } = useUser()
+  
+  if (to.meta.requiresAuth && !currentUser.value) {
+    next('/login')
+    return
+  }
+  
+  if (to.meta.requiresAdmin) {
+    if (!currentUser.value) {
+      next('/login')
+      return
+    }
+    if (currentUser.value.role !== '管理员') {
+      alert('没有权限访问管理后台！')
+      next('/')
+      return
+    }
+  }
+  
+  next()
+})
+
+export default router

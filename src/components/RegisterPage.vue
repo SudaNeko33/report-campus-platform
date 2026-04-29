@@ -8,9 +8,9 @@
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">注册新账户</h2>
         <p class="mt-2 text-center text-sm text-gray-600">
           已有账户？
-          <button @click="$emit('navigate', 'login')" class="font-medium text-primary-600 hover:text-primary-500">
+          <router-link to="/login" class="font-medium text-primary-600 hover:text-primary-500">
             立即登录
-          </button>
+          </router-link>
         </p>
       </div>
 
@@ -99,11 +99,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { UserPlus } from 'lucide-vue-next'
 import { useUser } from '../composables/useUser'
 
-const emit = defineEmits(['navigate', 'registerSuccess'])
-
+const router = useRouter()
 const { register } = useUser()
 
 const formData = ref({
@@ -136,7 +136,7 @@ const handleRegister = () => {
   if (result.success) {
     successMessage.value = '注册成功！正在跳转...'
     setTimeout(() => {
-      emit('registerSuccess', result.user)
+      router.push('/login')
     }, 1500)
   } else {
     errorMessage.value = result.message

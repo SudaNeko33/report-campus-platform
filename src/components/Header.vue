@@ -3,22 +3,22 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-8">
-          <div class="flex items-center cursor-pointer" @click="$emit('navigate', 'home')">
+          <router-link to="/" class="flex items-center">
             <ShoppingBag class="h-8 w-8 text-primary-600" />
             <span class="text-xl font-bold text-gray-900 ml-2">校园二手</span>
-          </div>
+          </router-link>
           <nav class="hidden md:flex space-x-6">
-            <button 
+            <router-link 
               v-for="item in navItems" 
               :key="item.key"
-              @click="$emit('navigate', item.key)"
+              :to="item.path"
               :class="[
                 'text-sm font-medium transition-colors',
-                currentPage === item.key ? 'text-primary-600' : 'text-gray-600 hover:text-gray-900'
+                isActive(item.path) ? 'text-primary-600' : 'text-gray-600 hover:text-gray-900'
               ]"
             >
               {{ item.label }}
-            </button>
+            </router-link>
           </nav>
         </div>
         <div class="flex items-center space-x-4">
@@ -44,12 +44,13 @@
               v-show="showDropdown"
               class="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-50"
             >
-              <button 
-                @click="$emit('navigate', 'profile'); showDropdown = false"
+              <router-link 
+                to="/profile" 
+                @click="showDropdown = false"
                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 个人中心
-              </button>
+              </router-link>
               <button 
                 @click="$emit('logout'); showDropdown = false"
                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -58,14 +59,14 @@
               </button>
             </div>
           </div>
-          <button 
+          <router-link 
             v-else
-            @click="$emit('navigate', 'login')"
+            to="/login"
             class="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-colors"
           >
             <User class="h-5 w-5" />
             <span class="text-sm font-medium">登录</span>
-          </button>
+          </router-link>
         </div>
       </div>
     </div>
@@ -73,32 +74,37 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { ShoppingBag, Search, User } from 'lucide-vue-next'
 
+const router = useRouter()
+
 defineProps({
-  currentPage: {
-    type: String,
-    default: 'home'
-  },
   currentUser: {
     type: Object,
     default: null
   }
 })
 
-const emit = defineEmits(['navigate', 'search', 'logout'])
+const emit = defineEmits(['search', 'logout'])
 
 const searchKeyword = ref('')
 const showDropdown = ref(false)
 let leaveTimer = null
 
 const navItems = [
-  { key: 'home', label: '首页' },
-  { key: 'publish', label: '发布商品' },
-  { key: 'orders', label: '我的订单' },
-  { key: 'admin', label: '管理后台' }
+  { key: 'home', label: '首页', path: '/' },
+  { key: 'publish', label: '发布商品', path: '/publish' },
+  { key: 'orders', label: '我的订单', path: '/orders' },
+  { key: 'admin', label: '管理后台', path: '/admin' }
 ]
+
+const currentPath = computed(() => router.currentRoute.value.path)
+
+const isActive = (path) => {
+  return currentPath.value === path
+}
 
 const handleSearch = () => {
   emit('search', searchKeyword.value)
