@@ -130,11 +130,16 @@ import { computed } from 'vue'
 import { User, Star, Package, ShoppingCart, MessageSquare } from 'lucide-vue-next'
 import { users, goods, orders, comments } from '../data/mockData'
 
-const currentUser = users[0]
+const props = defineProps({
+  currentUser: {
+    type: Object,
+    required: true
+  }
+})
 
-const myGoods = computed(() => goods.filter(g => g.user_id === currentUser.user_id))
-const myOrders = computed(() => orders.filter(o => o.buyer_id === currentUser.user_id || o.seller_id === currentUser.user_id))
-const myComments = computed(() => comments.filter(c => c.from_uid === currentUser.user_id))
+const myGoods = computed(() => goods.filter(g => g.user_id === props.currentUser.user_id))
+const myOrders = computed(() => orders.filter(o => o.buyer_id === props.currentUser.user_id || o.seller_id === props.currentUser.user_id))
+const myComments = computed(() => comments.filter(c => c.from_uid === props.currentUser.user_id))
 
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
 

@@ -88,6 +88,13 @@ import { ref, computed } from 'vue'
 import { Package } from 'lucide-vue-next'
 import { orders, goods, users } from '../data/mockData'
 
+const props = defineProps({
+  currentUser: {
+    type: Object,
+    required: true
+  }
+})
+
 const activeTab = ref('all')
 
 const tabs = [
@@ -97,19 +104,24 @@ const tabs = [
   { key: 'cancelled', label: '已取消' }
 ]
 
+const userOrders = computed(() => {
+  const userId = props.currentUser.user_id
+  return orders.filter(o => o.buyer_id === userId || o.seller_id === userId)
+})
+
 const filteredOrders = computed(() => {
-  if (activeTab.value === 'all') return orders
-  if (activeTab.value === 'pending') return orders.filter(o => o.status === '待交易')
-  if (activeTab.value === 'completed') return orders.filter(o => o.status === '已完成')
-  if (activeTab.value === 'cancelled') return orders.filter(o => o.status === '已取消')
-  return orders
+  if (activeTab.value === 'all') return userOrders.value
+  if (activeTab.value === 'pending') return userOrders.value.filter(o => o.status === '待交易')
+  if (activeTab.value === 'completed') return userOrders.value.filter(o => o.status === '已完成')
+  if (activeTab.value === 'cancelled') return userOrders.value.filter(o => o.status === '已取消')
+  return userOrders.value
 })
 
 const getTabCount = (key) => {
-  if (key === 'all') return orders.length
-  if (key === 'pending') return orders.filter(o => o.status === '待交易').length
-  if (key === 'completed') return orders.filter(o => o.status === '已完成').length
-  if (key === 'cancelled') return orders.filter(o => o.status === '已取消').length
+  if (key === 'all') return userOrders.value.length
+  if (key === 'pending') return userOrders.value.filter(o => o.status === '待交易').length
+  if (key === 'completed') return userOrders.value.filter(o => o.status === '已完成').length
+  if (key === 'cancelled') return userOrders.value.filter(o => o.status === '已取消').length
   return 0
 }
 

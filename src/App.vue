@@ -34,9 +34,11 @@
       />
       <OrdersPage 
         v-else-if="currentPage === 'orders'" 
+        :currentUser="currentUser"
       />
       <ProfilePage 
         v-else-if="currentPage === 'profile'" 
+        :currentUser="currentUser"
       />
       <AdminPage 
         v-else-if="currentPage === 'admin'" 
