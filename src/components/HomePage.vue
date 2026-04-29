@@ -91,16 +91,40 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { User, Star, Package } from 'lucide-vue-next'
+import { useRoute } from 'vue-router'
 import { goods, categories, users, campusOptions } from '../data/mockData'
+
+const route = useRoute()
 
 const filterCategory = ref(null)
 const filterCampus = ref(null)
 const sortBy = ref('create_time')
+const searchKeyword = ref('')
+
+onMounted(() => {
+  if (route.query.keyword) {
+    searchKeyword.value = route.query.keyword
+  }
+})
+
+watch(() => route.query.keyword, (newKeyword) => {
+  if (newKeyword) {
+    searchKeyword.value = newKeyword
+  }
+})
 
 const filteredGoods = computed(() => {
   let result = goods.filter(g => g.status === '已上架')
+  
+  if (searchKeyword.value) {
+    const keyword = searchKeyword.value.toLowerCase()
+    result = result.filter(g => 
+      g.goods_name.toLowerCase().includes(keyword) ||
+      g.description.toLowerCase().includes(keyword)
+    )
+  }
   
   if (filterCategory.value) {
     result = result.filter(g => g.category_id === filterCategory.value)

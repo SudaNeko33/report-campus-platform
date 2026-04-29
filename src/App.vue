@@ -46,8 +46,7 @@ onMounted(() => {
 })
 
 const handleSearch = (keyword) => {
-  router.push('/')
-  alert(`搜索：${keyword}`)
+  router.push({ path: '/', query: { keyword: keyword } })
 }
 
 const handleLogout = () => {
