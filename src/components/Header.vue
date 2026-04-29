@@ -32,11 +32,9 @@
             />
             <Search class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           </div>
-          <div v-if="currentUser" class="relative">
+          <div v-if="currentUser" class="relative" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
             <button 
               @click="showDropdown = !showDropdown"
-              @mouseenter="showDropdown = true"
-              @mouseleave="showDropdown = false"
               class="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-colors"
             >
               <User class="h-5 w-5" />
@@ -44,9 +42,7 @@
             </button>
             <div 
               v-show="showDropdown"
-              @mouseenter="showDropdown = true"
-              @mouseleave="showDropdown = false"
-              class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+              class="absolute right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-50"
             >
               <button 
                 @click="$emit('navigate', 'profile'); showDropdown = false"
@@ -95,6 +91,7 @@ const emit = defineEmits(['navigate', 'search', 'logout'])
 
 const searchKeyword = ref('')
 const showDropdown = ref(false)
+let leaveTimer = null
 
 const navItems = [
   { key: 'home', label: '首页' },
@@ -105,5 +102,19 @@ const navItems = [
 
 const handleSearch = () => {
   emit('search', searchKeyword.value)
+}
+
+const handleMouseEnter = () => {
+  if (leaveTimer) {
+    clearTimeout(leaveTimer)
+    leaveTimer = null
+  }
+  showDropdown.value = true
+}
+
+const handleMouseLeave = () => {
+  leaveTimer = setTimeout(() => {
+    showDropdown.value = false
+  }, 200)
 }
 </script>
