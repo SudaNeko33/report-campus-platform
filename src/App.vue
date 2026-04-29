@@ -80,6 +80,17 @@ onMounted(() => {
 })
 
 const handleNavigate = (page) => {
+  if (page === 'admin') {
+    if (!currentUser.value) {
+      alert('请先登录！')
+      currentPage.value = 'login'
+      return
+    }
+    if (currentUser.value.role !== '管理员') {
+      alert('只有管理员才能访问管理后台！')
+      return
+    }
+  }
   currentPage.value = page
 }
 
