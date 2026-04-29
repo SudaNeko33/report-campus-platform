@@ -32,12 +32,36 @@
             />
             <Search class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
           </div>
+          <div v-if="currentUser" class="relative group">
+            <button 
+              @click="$emit('navigate', 'profile')"
+              class="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-colors"
+            >
+              <User class="h-5 w-5" />
+              <span class="text-sm font-medium">{{ currentUser.real_name }}</span>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
+              <button 
+                @click="$emit('navigate', 'profile')"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                个人中心
+              </button>
+              <button 
+                @click="$emit('logout')"
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                退出登录
+              </button>
+            </div>
+          </div>
           <button 
-            @click="$emit('navigate', 'profile')"
+            v-else
+            @click="$emit('navigate', 'login')"
             class="flex items-center space-x-2 px-4 py-2 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-colors"
           >
             <User class="h-5 w-5" />
-            <span class="text-sm font-medium">{{ currentUser?.real_name || '登录' }}</span>
+            <span class="text-sm font-medium">登录</span>
           </button>
         </div>
       </div>
@@ -48,19 +72,21 @@
 <script setup>
 import { ref } from 'vue'
 import { ShoppingBag, Search, User } from 'lucide-vue-next'
-import { users } from '../data/mockData'
 
 defineProps({
   currentPage: {
     type: String,
     default: 'home'
+  },
+  currentUser: {
+    type: Object,
+    default: null
   }
 })
 
-const emit = defineEmits(['navigate', 'search'])
+const emit = defineEmits(['navigate', 'search', 'logout'])
 
 const searchKeyword = ref('')
-const currentUser = ref(users[0])
 
 const navItems = [
   { key: 'home', label: '首页' },
