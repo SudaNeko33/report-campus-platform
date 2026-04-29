@@ -51,10 +51,18 @@
       </div>
     </div>
     <div class="bg-white rounded-lg shadow-sm">
-      <div class="border-b border-gray-200 px-6 py-4">
+      <div 
+        class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
+        @click="collapsePendingGoods = !collapsePendingGoods"
+      >
         <h2 class="font-semibold text-gray-900">待审核商品</h2>
+        <ChevronDown 
+          class="h-5 w-5 text-gray-400 transition-transform duration-200"
+          :class="{ 'rotate-180': !collapsePendingGoods }"
+        />
       </div>
-      <div class="overflow-x-auto">
+      <transition name="collapse">
+        <div v-show="!collapsePendingGoods" class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-50">
             <tr>
@@ -114,102 +122,262 @@
           </tbody>
         </table>
       </div>
+      </transition>
     </div>
     <div class="mt-6 bg-white rounded-lg shadow-sm">
-      <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <h2 class="font-semibold text-gray-900">用户管理</h2>
-        <div class="relative">
-          <input 
-            v-model="userSearchKeyword"
-            type="text" 
-            placeholder="搜索用户名/姓名/学号..."
-            class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
-          <Search class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-        </div>
+      <div 
+        class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
+        @click="collapseAllGoods = !collapseAllGoods"
+      >
+        <h2 class="font-semibold text-gray-900">所有商品列表</h2>
+        <ChevronDown 
+          class="h-5 w-5 text-gray-400 transition-transform duration-200"
+          :class="{ 'rotate-180': !collapseAllGoods }"
+        />
       </div>
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户ID</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户名</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户信息</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学号</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">联系方式</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">角色</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评分</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册时间</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="user in filteredUsers" :key="user.user_id">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.user_id }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <p class="font-medium text-gray-900">{{ user.username }}</p>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
-                    <User class="h-5 w-5 text-primary-600" />
+      <transition name="collapse">
+        <div v-show="!collapseAllGoods" class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品信息</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布者</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">校区</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">价格</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布时间</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="good in goods" :key="good.goods_id">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden mr-4">
+                      <img :src="good.images" :alt="good.goods_name" class="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-900">{{ good.goods_name }}</p>
+                      <p class="text-sm text-gray-500 line-clamp-1">{{ good.description }}</p>
+                    </div>
                   </div>
-                  <p class="font-medium text-gray-900">{{ user.real_name }}</p>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.student_id }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.contact || '-' }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="[
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{{ getCategoryName(good.category_id) }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-sm text-gray-900">{{ getUserName(good.user_id) }}</p>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{{ good.campus }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-lg font-bold text-red-500">¥{{ good.price }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="[
                   'px-3 py-1 text-sm rounded-full',
-                  user.role === '管理员' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
-                ]">{{ user.role }}</span>
+                  good.status === '已上架' ? 'bg-green-100 text-green-700' :
+                  good.status === '待审核' ? 'bg-yellow-100 text-yellow-700' :
+                  good.status === '已售出' ? 'bg-blue-100 text-blue-700' :
+                  good.status === '暂存（已联系）' ? 'bg-purple-100 text-purple-700' :
+                  'bg-gray-100 text-gray-700'
+                ]">{{ good.status }}</span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <Star class="h-4 w-4 text-yellow-400" />
-                  <span class="ml-1 text-gray-900">{{ user.score }}</span>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="[
-                  'px-3 py-1 text-sm rounded-full',
-                  user.status === '正常' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                ]">{{ user.status }}</span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.create_time }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex space-x-2">
-                  <button 
-                    @click="openEditModal(user)"
-                    class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
-                  >
-                    编辑
-                  </button>
-                  <button 
-                    @click="toggleUserStatus(user.user_id, user.status)"
-                    :class="[
-                      'px-4 py-2 text-sm rounded-lg transition-colors',
-                      user.status === '正常' 
-                        ? 'bg-red-600 text-white hover:bg-red-700' 
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    ]"
-                  >
-                    {{ user.status === '正常' ? '封禁' : '解封' }}
-                  </button>
-                </div>
-              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ good.create_time }}</td>
             </tr>
-            <tr v-if="filteredUsers.length === 0">
-              <td colspan="10" class="px-6 py-8 text-center">
-                <Users class="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                <p class="text-gray-500">未找到匹配的用户</p>
+            <tr v-if="goods.length === 0">
+              <td colspan="7" class="px-6 py-8 text-center">
+                <Package class="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                <p class="text-gray-500">暂无商品</p>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+      </transition>
+    </div>
+
+    <div class="mt-6 bg-white rounded-lg shadow-sm">
+      <div 
+        class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
+        @click="collapseOrders = !collapseOrders"
+      >
+        <h2 class="font-semibold text-gray-900">所有订单列表</h2>
+        <ChevronDown 
+          class="h-5 w-5 text-gray-400 transition-transform duration-200"
+          :class="{ 'rotate-180': !collapseOrders }"
+        />
+      </div>
+      <transition name="collapse">
+        <div v-show="!collapseOrders" class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商品信息</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">买家</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">卖家</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">价格</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">下单时间</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">完成时间</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="order in orders" :key="order.order_id">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">#{{ order.order_id }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden mr-3">
+                      <img :src="getGoodsImage(order.goods_id)" :alt="getGoodsName(order.goods_id)" class="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-900">{{ getGoodsName(order.goods_id) }}</p>
+                      <p class="text-sm text-red-500">¥{{ getGoodsPrice(order.goods_id) }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-sm text-gray-900">{{ getUserName(order.buyer_id) }}</p>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <p class="text-sm text-gray-900">{{ getUserName(order.seller_id) }}</p>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-lg font-bold text-red-500">¥{{ getGoodsPrice(order.goods_id) }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="[
+                    'px-3 py-1 text-sm rounded-full',
+                    order.status === '待交易' ? 'bg-yellow-100 text-yellow-700' :
+                    order.status === '已完成' ? 'bg-green-100 text-green-700' :
+                    'bg-red-100 text-red-700'
+                  ]">{{ order.status }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.create_time }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ order.finish_time || '-' }}</td>
+              </tr>
+              <tr v-if="orders.length === 0">
+                <td colspan="8" class="px-6 py-8 text-center">
+                  <ShoppingCart class="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                  <p class="text-gray-500">暂无订单</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        </transition>
+    </div>
+
+    <div class="mt-6 bg-white rounded-lg shadow-sm">
+      <div 
+        class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
+        @click="collapseUsers = !collapseUsers"
+      >
+        <h2 class="font-semibold text-gray-900">用户管理</h2>
+        <ChevronDown 
+          class="h-5 w-5 text-gray-400 transition-transform duration-200"
+          :class="{ 'rotate-180': !collapseUsers }"
+        />
+      </div>
+      <transition name="collapse">
+        <div v-show="!collapseUsers">
+          <div class="px-6 py-4 flex items-center justify-between bg-gray-50">
+            <div class="relative">
+              <input 
+                v-model="userSearchKeyword"
+                type="text" 
+                placeholder="搜索用户名/姓名/学号..."
+                class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              />
+              <Search class="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户ID</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户名</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户信息</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学号</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">联系方式</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">角色</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评分</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册时间</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="user in filteredUsers" :key="user.user_id">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.user_id }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <p class="font-medium text-gray-900">{{ user.username }}</p>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                        <User class="h-5 w-5 text-primary-600" />
+                      </div>
+                      <p class="font-medium text-gray-900">{{ user.real_name }}</p>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.student_id }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.contact || '-' }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span :class="[
+                      'px-3 py-1 text-sm rounded-full',
+                      user.role === '管理员' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                    ]">{{ user.role }}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <Star class="h-4 w-4 text-yellow-400" />
+                      <span class="ml-1 text-gray-900">{{ user.score }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span :class="[
+                      'px-3 py-1 text-sm rounded-full',
+                      user.status === '正常' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    ]">{{ user.status }}</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.create_time }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex space-x-2">
+                      <button 
+                        @click="openEditModal(user)"
+                        class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                      >
+                        编辑
+                      </button>
+                      <button 
+                        @click="toggleUserStatus(user.user_id, user.status)"
+                        :class="[
+                          'px-4 py-2 text-sm rounded-lg transition-colors',
+                          user.status === '正常' 
+                            ? 'bg-red-600 text-white hover:bg-red-700' 
+                            : 'bg-green-600 text-white hover:bg-green-700'
+                        ]"
+                      >
+                        {{ user.status === '正常' ? '封禁' : '解封' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="filteredUsers.length === 0">
+                  <td colspan="10" class="px-6 py-8 text-center">
+                    <Users class="h-12 w-12 text-gray-300 mx-auto mb-2" />
+                    <p class="text-gray-500">未找到匹配的用户</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        </transition>
     </div>
 
     <div 
@@ -307,11 +475,15 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
-import { Package, Clock, Users, ShoppingCart, User, Star, Search } from 'lucide-vue-next'
+import { Package, Clock, Users, ShoppingCart, User, Star, Search, ChevronDown } from 'lucide-vue-next'
 import { goods, users, categories, orders } from '../data/mockData'
 
 const userSearchKeyword = ref('')
 const showEditModal = ref(false)
+const collapsePendingGoods = ref(false)
+const collapseAllGoods = ref(false)
+const collapseOrders = ref(false)
+const collapseUsers = ref(false)
 const editingUser = reactive({
   user_id: null,
   username: '',
@@ -338,6 +510,9 @@ const filteredUsers = computed(() => {
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
 const getUserStudentId = (id) => users.find(u => u.user_id === id)?.student_id || ''
+const getGoodsName = (id) => goods.find(g => g.goods_id === id)?.goods_name || '未知商品'
+const getGoodsImage = (id) => goods.find(g => g.goods_id === id)?.images || ''
+const getGoodsPrice = (id) => goods.find(g => g.goods_id === id)?.price || 0
 
 const handleApprove = (id) => {
   const good = goods.find(g => g.goods_id === id)
@@ -394,3 +569,27 @@ const saveUser = () => {
   }
 }
 </script>
+
+<style scoped>
+.collapse-enter-active,
+.collapse-leave-active {
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.collapse-enter-from,
+.collapse-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.collapse-enter-to,
+.collapse-leave-from {
+  max-height: 2000px;
+  opacity: 1;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+</style>
