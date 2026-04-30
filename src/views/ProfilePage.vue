@@ -143,7 +143,7 @@ const route = useRoute()
 
 const targetUserId = computed(() => {
   if (route.params.userId) {
-    return parseInt(route.params.userId)
+    return route.params.userId
   }
   return currentUser.value?.user_id
 })
