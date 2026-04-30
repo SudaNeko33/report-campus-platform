@@ -2,7 +2,16 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-900">管理后台</h1>
-      <span class="px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">管理员</span>
+      <div class="flex items-center space-x-4">
+        <button 
+          @click="handleResetData"
+          class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors flex items-center"
+        >
+          <RefreshCw class="h-4 w-4 mr-2" />
+          重置数据
+        </button>
+        <span class="px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">管理员</span>
+      </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
       <div class="bg-white rounded-lg shadow-sm p-6">
@@ -500,8 +509,8 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
-import { Package, Clock, Users, ShoppingCart, User, Star, Search, ChevronDown } from 'lucide-vue-next'
-import { goods, users, categories, orders } from '../data/store'
+import { Package, Clock, Users, ShoppingCart, User, Star, Search, ChevronDown, RefreshCw } from 'lucide-vue-next'
+import { goods, users, categories, orders, resetData } from '../data/store'
 
 const userSearchKeyword = ref('')
 const showEditModal = ref(false)
@@ -604,6 +613,13 @@ const toggleGoodStatus = (id, action) => {
       good.status = '已下架'
       alert(`商品 "${good.goods_name}" 已下架！`)
     }
+  }
+}
+
+const handleResetData = () => {
+  if (confirm('确定要重置所有数据吗？这将清空所有用户、商品、订单和评论数据，恢复到初始状态！此操作不可恢复！')) {
+    resetData()
+    location.reload()
   }
 }
 
