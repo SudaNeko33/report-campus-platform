@@ -32,10 +32,10 @@ const routes = [
     meta: { requiresAdmin: true }
   },
   {
-    path: '/profile',
+    path: '/profile/:userId?',
     name: 'profile',
     component: ProfilePage,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: false }
   },
   {
     path: '/login',

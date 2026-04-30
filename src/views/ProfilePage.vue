@@ -1,8 +1,8 @@
 <template>
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div v-if="!currentUser" class="bg-white rounded-lg shadow-sm p-12 text-center">
+    <div v-if="!targetUser" class="bg-white rounded-lg shadow-sm p-12 text-center">
       <User class="h-16 w-16 text-gray-300 mx-auto mb-4" />
-      <p class="text-gray-500">请先登录</p>
+      <p class="text-gray-500">用户不存在</p>
     </div>
     <template v-else>
       <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg shadow-lg p-8 mb-6 text-white">
@@ -11,14 +11,14 @@
           <User class="h-12 w-12 text-primary-600" />
         </div>
         <div>
-          <h1 class="text-2xl font-bold">{{ currentUser.real_name }}</h1>
-          <p class="text-primary-100 mt-1">{{ currentUser.username }}</p>
+          <h1 class="text-2xl font-bold">{{ targetUser.username }}</h1>
+          <p class="text-primary-100 mt-1">{{ targetUser.real_name }}</p>
           <div class="flex items-center space-x-4 mt-2">
             <div class="flex items-center">
               <Star class="h-5 w-5 text-yellow-400" />
-              <span class="ml-1">{{ currentUser.score }}</span>
+              <span class="ml-1">{{ targetUser.score }}</span>
             </div>
-            <span>{{ currentUser.student_id }}</span>
+            <span>{{ targetUser.student_id }}</span>
           </div>
         </div>
       </div>
@@ -133,30 +133,51 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { User, Star, Package, ShoppingCart, MessageSquare } from 'lucide-vue-next'
 import { users, goods, orders, comments } from '../data/store'
+import { useUser } from '../composables/useUser'
 
-const props = defineProps({
-  currentUser: {
-    type: Object,
-    default: null
+const { currentUser } = useUser()
+const route = useRoute()
+
+const targetUserId = computed(() => {
+  if (route.params.userId) {
+    return parseInt(route.params.userId)
   }
+  return currentUser.value?.user_id
+})
+
+const targetUser = computed(() => {
+  if (!targetUserId.value) return null
+  return users.find(u => u.user_id === targetUserId.value)
 })
 
 const myGoods = computed(() => {
-  if (!props.currentUser) return []
-  return goods.filter(g => g.user_id === props.currentUser.user_id)
+  if (!targetUser.value) return []
+  const isOwner = currentUser.value && currentUser.value.user_id === targetUser.value.user_id
+  const userGoods = goods.filter(g => g.user_id === targetUser.value.user_id)
+  
+  if (isOwner) {
+    return userGoods
+  }
+  
+  return userGoods.filter(g => 
+    g.status === '已上架' || 
+    g.status === '已售出' || 
+    g.status === '暂存（已联系）'
+  )
 })
 const myOrders = computed(() => {
-  if (!props.currentUser) return []
-  return orders.filter(o => o.buyer_id === props.currentUser.user_id || o.seller_id === props.currentUser.user_id)
+  if (!targetUser.value) return []
+  return orders.filter(o => o.buyer_id === targetUser.value.user_id || o.seller_id === targetUser.value.user_id)
 })
 const myComments = computed(() => {
-  if (!props.currentUser) return []
-  return comments.filter(c => c.to_uid === props.currentUser.user_id)
+  if (!targetUser.value) return []
+  return comments.filter(c => c.to_uid === targetUser.value.user_id)
 })
 
-const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
+const getUserName = (id) => users.find(u => u.user_id === id)?.username || '未知用户'
 
 const getStatusClass = (status) => {
   switch (status) {

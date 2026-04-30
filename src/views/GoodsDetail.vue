@@ -33,7 +33,10 @@
             </div>
           </div>
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div class="flex items-center space-x-3">
+            <div 
+              @click="goToSellerProfile"
+              class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 rounded-lg p-2 -m-2 transition-colors"
+            >
               <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
                 <User class="h-6 w-6 text-primary-600" />
               </div>
@@ -45,6 +48,7 @@
                 </div>
                 <span class="text-sm text-gray-500">{{ getUserStudentId(goods.user_id) }}</span>
               </div>
+              <ExternalLink class="h-5 w-5 text-gray-400" />
             </div>
           </div>
           <div class="flex space-x-4">
@@ -195,7 +199,7 @@
 <script setup>
 import { ref, computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { ArrowLeft, User, Star, MessageCircle, ShoppingCart, Edit, Trash2, X } from 'lucide-vue-next'
+import { ArrowLeft, User, Star, MessageCircle, ShoppingCart, Edit, Trash2, X, ExternalLink } from 'lucide-vue-next'
 import { goods as goodsData, categories, users, campusOptions } from '../data/store'
 import { useUser } from '../composables/useUser'
 
@@ -299,6 +303,12 @@ const handleRemove = () => {
       good.update_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
       alert('商品已下架！')
     }
+  }
+}
+
+const goToSellerProfile = () => {
+  if (goods.value) {
+    window.location.href = `/profile/${goods.value.user_id}`
   }
 }
 </script>
