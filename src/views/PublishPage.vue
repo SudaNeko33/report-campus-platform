@@ -106,7 +106,7 @@
 <script setup>
 import { reactive } from 'vue'
 import { ImagePlus } from 'lucide-vue-next'
-import { categories, campusOptions } from '../data/mockData'
+import { categories, campusOptions } from '../data/store'
 
 defineEmits(['back'])
 

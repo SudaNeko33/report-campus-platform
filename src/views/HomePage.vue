@@ -94,7 +94,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { User, Star, Package } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
-import { goods, categories, users, campusOptions } from '../data/mockData'
+import { goods, categories, users, campusOptions } from '../data/store'
 
 const route = useRoute()
 

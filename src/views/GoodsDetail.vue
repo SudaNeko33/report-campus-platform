@@ -85,7 +85,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeft, User, Star, MessageCircle, ShoppingCart } from 'lucide-vue-next'
-import { goods as goodsData, categories, users } from '../data/mockData'
+import { goods as goodsData, categories, users } from '../data/store'
 
 const route = useRoute()
 

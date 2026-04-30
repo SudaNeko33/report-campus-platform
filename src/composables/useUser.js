@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { users } from '../data/mockData'
+import { users } from '../data/store'
 
 const currentUser = ref(null)
 

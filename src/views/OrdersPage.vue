@@ -86,7 +86,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { Package } from 'lucide-vue-next'
-import { orders, goods, users } from '../data/mockData'
+import { orders, goods, users } from '../data/store'
 
 const props = defineProps({
   currentUser: {
@@ -141,11 +141,33 @@ const getStatusClass = (status) => {
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
 
 const handleComplete = (id) => {
-  alert(`订单 ${id} 已完成！`)
+  const order = orders.find(o => o.order_id === id)
+  if (order) {
+    order.status = '已完成'
+    order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+    
+    const good = goods.find(g => g.goods_id === order.goods_id)
+    if (good) {
+      good.status = '已售出'
+    }
+    
+    alert(`订单 ${id} 已完成！`)
+  }
 }
 
 const handleCancel = (id) => {
-  alert(`订单 ${id} 已取消！`)
+  const order = orders.find(o => o.order_id === id)
+  if (order) {
+    order.status = '已取消'
+    order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+    
+    const good = goods.find(g => g.goods_id === order.goods_id)
+    if (good) {
+      good.status = '已上架'
+    }
+    
+    alert(`订单 ${id} 已取消！`)
+  }
 }
 
 const handleComment = (id) => {

@@ -501,7 +501,7 @@
 <script setup>
 import { ref, computed, reactive } from 'vue'
 import { Package, Clock, Users, ShoppingCart, User, Star, Search, ChevronDown } from 'lucide-vue-next'
-import { goods, users, categories, orders } from '../data/mockData'
+import { goods, users, categories, orders } from '../data/store'
 
 const userSearchKeyword = ref('')
 const showEditModal = ref(false)

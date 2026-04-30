@@ -134,7 +134,7 @@
 <script setup>
 import { computed } from 'vue'
 import { User, Star, Package, ShoppingCart, MessageSquare } from 'lucide-vue-next'
-import { users, goods, orders, comments } from '../data/mockData'
+import { users, goods, orders, comments } from '../data/store'
 
 const props = defineProps({
   currentUser: {
