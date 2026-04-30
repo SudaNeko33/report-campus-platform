@@ -90,7 +90,7 @@
     </div>
     <div class="mt-6 bg-white rounded-lg shadow-sm">
       <div class="border-b border-gray-200 px-6 py-4">
-        <h2 class="font-semibold text-gray-900">我的评价</h2>
+        <h2 class="font-semibold text-gray-900">收到的评价</h2>
       </div>
       <div class="p-6">
         <div class="space-y-4">
@@ -105,7 +105,7 @@
               </div>
               <div class="flex-1">
                 <div class="flex items-center space-x-2">
-                  <span class="font-medium text-gray-900">{{ getUserName(comment.to_uid) }}</span>
+                  <span class="font-medium text-gray-900">{{ getUserName(comment.from_uid) }}</span>
                   <div class="flex">
                     <Star 
                       v-for="i in 5" 
@@ -153,7 +153,7 @@ const myOrders = computed(() => {
 })
 const myComments = computed(() => {
   if (!props.currentUser) return []
-  return comments.filter(c => c.from_uid === props.currentUser.user_id)
+  return comments.filter(c => c.to_uid === props.currentUser.user_id)
 })
 
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
