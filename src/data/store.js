@@ -44,6 +44,13 @@ watch(comments, (newVal) => saveToStorage(STORAGE_KEYS.COMMENTS, newVal), { deep
 
 export { campusOptions, goodsStatusOptions, orderStatusOptions }
 
+export const getUserScore = (userId) => {
+  const userComments = comments.filter(c => c.to_uid === userId)
+  if (userComments.length === 0) return 0
+  const totalScore = userComments.reduce((sum, c) => sum + c.score, 0)
+  return (totalScore / userComments.length).toFixed(1)
+}
+
 export function resetData() {
   localStorage.removeItem(STORAGE_KEYS.USERS)
   localStorage.removeItem(STORAGE_KEYS.GOODS)

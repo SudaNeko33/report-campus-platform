@@ -16,7 +16,7 @@
           <div class="flex items-center space-x-4 mt-2">
             <div class="flex items-center">
               <Star class="h-5 w-5 text-yellow-400" />
-              <span class="ml-1">{{ targetUser.score }}</span>
+              <span class="ml-1">{{ getUserScore(targetUser.user_id) }}</span>
             </div>
             <span>{{ targetUser.student_id }}</span>
           </div>
@@ -64,8 +64,8 @@
       </div>
       <div class="p-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div 
-            v-for="good in myGoods" 
+          <div
+            v-for="good in myGoods"
             :key="good.goods_id"
             class="flex space-x-4 p-4 bg-gray-50 rounded-lg"
           >
@@ -94,8 +94,8 @@
       </div>
       <div class="p-6">
         <div class="space-y-4">
-          <div 
-            v-for="comment in myComments" 
+          <div
+            v-for="comment in myComments"
             :key="comment.comment_id"
             class="p-4 bg-gray-50 rounded-lg"
           >
@@ -107,8 +107,8 @@
                 <div class="flex items-center space-x-2">
                   <span class="font-medium text-gray-900">{{ getUserName(comment.from_uid) }}</span>
                   <div class="flex">
-                    <Star 
-                      v-for="i in 5" 
+                    <Star
+                      v-for="i in 5"
                       :key="i"
                       class="h-4 w-4"
                       :class="i <= comment.score ? 'text-yellow-400 fill-current' : 'text-gray-300'"
@@ -135,7 +135,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { User, Star, Package, ShoppingCart, MessageSquare } from 'lucide-vue-next'
-import { users, goods, orders, comments } from '../data/store'
+import { users, goods, orders, comments, getUserScore } from '../data/store'
 import { useUser } from '../composables/useUser'
 
 const { currentUser } = useUser()
@@ -157,14 +157,14 @@ const myGoods = computed(() => {
   if (!targetUser.value) return []
   const isOwner = currentUser.value && currentUser.value.user_id === targetUser.value.user_id
   const userGoods = goods.filter(g => g.user_id === targetUser.value.user_id)
-  
+
   if (isOwner) {
     return userGoods
   }
-  
-  return userGoods.filter(g => 
-    g.status === '已上架' || 
-    g.status === '已售出' || 
+
+  return userGoods.filter(g =>
+    g.status === '已上架' ||
+    g.status === '已售出' ||
     g.status === '暂存（已联系）'
   )
 })

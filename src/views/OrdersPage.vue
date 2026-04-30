@@ -3,14 +3,14 @@
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <h1 class="text-2xl font-bold text-gray-900 mb-6">我的订单</h1>
       <div class="flex space-x-4 mb-6">
-        <button 
-          v-for="tab in tabs" 
+        <button
+          v-for="tab in tabs"
           :key="tab.key"
           @click="activeTab = tab.key"
           :class="[
             'px-4 py-2 rounded-lg font-medium transition-colors',
-            activeTab === tab.key 
-              ? 'bg-primary-600 text-white' 
+            activeTab === tab.key
+              ? 'bg-primary-600 text-white'
               : 'bg-white text-gray-600 hover:bg-gray-50'
           ]"
         >
@@ -21,8 +21,8 @@
         </button>
       </div>
       <div class="space-y-4">
-        <div 
-          v-for="order in filteredOrders" 
+        <div
+          v-for="order in filteredOrders"
           :key="order.order_id"
           class="bg-white rounded-lg shadow-sm p-6"
         >
@@ -46,28 +46,28 @@
               <div class="flex items-center justify-between">
                 <span class="text-lg font-bold text-red-500">¥{{ getGoods(order.goods_id)?.price }}</span>
                 <div class="flex space-x-2">
-                  <button 
+                  <button
                     v-if="order.status === '待交易'"
                     @click="handleComplete(order.order_id)"
                     class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
                   >
                     确认完成
                   </button>
-                  <button 
+                  <button
                     v-if="order.status === '待交易'"
                     @click="handleCancel(order.order_id)"
                     class="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     取消订单
                   </button>
-                  <button 
+                  <button
                     v-if="order.status === '已完成' && !hasCommented(order.order_id)"
                     @click="handleComment(order.order_id)"
                     class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     去评价
                   </button>
-                  <span 
+                  <span
                     v-if="order.status === '已完成' && hasCommented(order.order_id)"
                     class="px-4 py-2 bg-gray-100 text-gray-500 text-sm rounded-lg"
                   >
@@ -107,12 +107,12 @@
               <p class="text-sm text-gray-500">评价对象：{{ getUserName(commentForm.target_id) }}</p>
             </div>
           </div>
-          
+
           <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-3">评分</label>
             <div class="flex space-x-2">
-              <button 
-                v-for="star in 5" 
+              <button
+                v-for="star in 5"
                 :key="star"
                 @click="setRating(star)"
                 class="text-3xl transition-colors hover:scale-110"
@@ -125,25 +125,25 @@
               {{ ratingText }}
             </p>
           </div>
-          
+
           <div class="mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2">评价内容</label>
-            <textarea 
+            <textarea
               v-model="commentForm.content"
               rows="4"
               placeholder="请输入您的评价..."
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
             ></textarea>
           </div>
-          
+
           <div class="flex space-x-4">
-            <button 
+            <button
               @click="closeCommentModal"
               class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               取消
             </button>
-            <button 
+            <button
               @click="submitComment"
               class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
             >
@@ -244,7 +244,7 @@ const handleComplete = (id) => {
   if (order) {
     order.status = '已完成'
     order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
-    
+
     const good = goods.find(g => g.goods_id === order.goods_id)
     if (good) {
       good.status = '已售出'
@@ -257,12 +257,12 @@ const handleCancel = (id) => {
   if (order) {
     order.status = '已取消'
     order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
-    
+
     const good = goods.find(g => g.goods_id === order.goods_id)
     if (good) {
       good.status = '已上架'
     }
-    
+
     alert(`订单 ${id} 已取消！`)
   }
 }
@@ -272,10 +272,10 @@ const handleComment = (id) => {
   if (order) {
     commentForm.order_id = order.order_id
     commentForm.goods_id = order.goods_id
-    
+
     const userId = props.currentUser.user_id
     commentForm.target_id = userId === order.buyer_id ? order.seller_id : order.buyer_id
-    
+
     commentForm.score = 5
     commentForm.content = ''
     showCommentModal.value = true
@@ -299,9 +299,9 @@ const submitComment = () => {
     alert('请输入评价内容！')
     return
   }
-  
+
   const currentUserId = props.currentUser.user_id
-  
+
   const newComment = {
     comment_id: comments.length > 0 ? Math.max(...comments.map(c => c.comment_id)) + 1 : 1,
     order_id: commentForm.order_id,
@@ -312,16 +312,9 @@ const submitComment = () => {
     score: commentForm.score,
     create_time: new Date().toISOString().slice(0, 19).replace('T', ' ')
   }
-  
+
   comments.push(newComment)
-  
-  const seller = users.find(u => u.user_id === commentForm.target_id)
-  if (seller) {
-    const sellerComments = comments.filter(c => c.to_uid === commentForm.target_id)
-    const totalScore = sellerComments.reduce((sum, c) => sum + c.score, 0)
-    seller.score = sellerComments.length > 0 ? (totalScore / sellerComments.length).toFixed(1) : 0
-  }
-  
+
   closeCommentModal()
 }
 </script>

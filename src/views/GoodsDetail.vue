@@ -33,7 +33,7 @@
             </div>
           </div>
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
-            <div 
+            <div
               @click="goToSellerProfile"
               class="flex items-center space-x-3 cursor-pointer hover:bg-gray-100 rounded-lg p-2 -m-2 transition-colors"
             >
@@ -52,7 +52,7 @@
             </div>
           </div>
           <div class="flex space-x-4">
-            <button 
+            <button
               v-if="!isOwner && goods.status === '已上架'"
               @click="handleContact"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
@@ -60,7 +60,7 @@
               <MessageCircle class="h-5 w-5" />
               <span>联系卖家</span>
             </button>
-            <button 
+            <button
               v-if="!isOwner && goods.status === '已上架'"
               @click="handleBuy"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
@@ -68,7 +68,7 @@
               <ShoppingCart class="h-5 w-5" />
               <span>我想要</span>
             </button>
-            <button 
+            <button
               v-if="!isOwner && goods.status !== '已上架'"
               disabled
               class="flex-1 px-6 py-3 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
@@ -77,14 +77,14 @@
             </button>
           </div>
           <div v-if="isOwner" class="flex space-x-4 mt-4">
-            <button 
+            <button
               @click="openEditModal"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Edit class="h-5 w-5" />
               <span>编辑商品</span>
             </button>
-            <button 
+            <button
               @click="handleRemove"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
             >
@@ -110,7 +110,7 @@
         <form @submit.prevent="handleEdit" class="p-6 space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">商品名称</label>
-            <input 
+            <input
               v-model="editForm.goods_name"
               type="text"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -119,7 +119,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">商品分类</label>
-            <select 
+            <select
               v-model="editForm.category_id"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
@@ -131,7 +131,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">商品描述</label>
-            <textarea 
+            <textarea
               v-model="editForm.description"
               rows="3"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -139,7 +139,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">价格</label>
-            <input 
+            <input
               v-model.number="editForm.price"
               type="number"
               min="0"
@@ -151,7 +151,7 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">所在校区</label>
             <div class="grid grid-cols-4 gap-2">
-              <button 
+              <button
                 v-for="campus in campusOptions"
                 :key="campus"
                 type="button"
@@ -169,21 +169,21 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">商品图片</label>
-            <input 
+            <input
               v-model="editForm.images"
               type="text"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
           <div class="flex space-x-4 pt-4">
-            <button 
+            <button
               type="button"
               @click="closeEditModal"
               class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
             >
               取消
             </button>
-            <button 
+            <button
               type="submit"
               class="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
             >
@@ -200,7 +200,7 @@
 import { ref, computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeft, User, Star, MessageCircle, ShoppingCart, Edit, Trash2, X, ExternalLink } from 'lucide-vue-next'
-import { goods as goodsData, categories, users, campusOptions } from '../data/store'
+import { goods as goodsData, categories, users, campusOptions, getUserScore } from '../data/store'
 import { useUser } from '../composables/useUser'
 
 const { currentUser } = useUser()
@@ -252,7 +252,6 @@ const statusClass = computed(() => {
 
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
-const getUserScore = (id) => users.find(u => u.user_id === id)?.score || 0
 const getUserStudentId = (id) => users.find(u => u.user_id === id)?.student_id || ''
 
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
@@ -279,7 +278,7 @@ const handleEdit = () => {
     alert('请选择校区！')
     return
   }
-  
+
   const good = goodsData.find(g => g.goods_id === goods.value.goods_id)
   if (good) {
     good.goods_name = editForm.goods_name
@@ -289,7 +288,7 @@ const handleEdit = () => {
     good.campus = editForm.campus
     good.images = editForm.images || good.images
     good.update_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
-    
+
     alert('商品信息已更新！')
     closeEditModal()
   }

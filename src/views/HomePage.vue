@@ -5,14 +5,14 @@
         <div class="bg-white rounded-lg shadow-sm p-6">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">商品分类</h3>
           <div class="space-y-2">
-            <button 
-              v-for="cat in categories" 
+            <button
+              v-for="cat in categories"
               :key="cat.category_id"
               @click="filterCategory = filterCategory === cat.category_id ? null : cat.category_id"
               :class="[
                 'w-full text-left px-4 py-2 rounded-lg transition-colors',
-                filterCategory === cat.category_id 
-                  ? 'bg-primary-100 text-primary-700' 
+                filterCategory === cat.category_id
+                  ? 'bg-primary-100 text-primary-700'
                   : 'text-gray-600 hover:bg-gray-100'
               ]"
             >
@@ -23,14 +23,14 @@
         <div class="bg-white rounded-lg shadow-sm p-6 mt-4">
           <h3 class="text-lg font-semibold text-gray-900 mb-4">校区筛选</h3>
           <div class="space-y-2">
-            <button 
-              v-for="campus in campusOptions" 
+            <button
+              v-for="campus in campusOptions"
               :key="campus"
               @click="filterCampus = filterCampus === campus ? null : campus"
               :class="[
                 'w-full text-left px-4 py-2 rounded-lg transition-colors',
-                filterCampus === campus 
-                  ? 'bg-primary-100 text-primary-700' 
+                filterCampus === campus
+                  ? 'bg-primary-100 text-primary-700'
                   : 'text-gray-600 hover:bg-gray-100'
               ]"
             >
@@ -46,8 +46,8 @@
         </div>
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-semibold text-gray-900">全部商品</h2>
-          <select 
-            v-model="sortBy" 
+          <select
+            v-model="sortBy"
             class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           >
             <option value="create_time">最新发布</option>
@@ -56,8 +56,8 @@
           </select>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div 
-            v-for="good in filteredGoods" 
+          <div
+            v-for="good in filteredGoods"
             :key="good.goods_id"
             class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
             @click="$router.push(`/detail/${good.goods_id}`)"
@@ -94,7 +94,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { User, Star, Package } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
-import { goods, categories, users, campusOptions } from '../data/store'
+import { goods, categories, users, campusOptions, getUserScore } from '../data/store'
 
 const route = useRoute()
 
@@ -117,23 +117,23 @@ watch(() => route.query.keyword, (newKeyword) => {
 
 const filteredGoods = computed(() => {
   let result = goods.filter(g => g.status === '已上架')
-  
+
   if (searchKeyword.value) {
     const keyword = searchKeyword.value.toLowerCase()
-    result = result.filter(g => 
+    result = result.filter(g =>
       g.goods_name.toLowerCase().includes(keyword) ||
       g.description.toLowerCase().includes(keyword)
     )
   }
-  
+
   if (filterCategory.value) {
     result = result.filter(g => g.category_id === filterCategory.value)
   }
-  
+
   if (filterCampus.value) {
     result = result.filter(g => g.campus === filterCampus.value)
   }
-  
+
   switch (sortBy.value) {
     case 'price_asc':
       result.sort((a, b) => a.price - b.price)
@@ -144,12 +144,11 @@ const filteredGoods = computed(() => {
     default:
       result.sort((a, b) => new Date(b.create_time) - new Date(a.create_time))
   }
-  
+
   return result
 })
 
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
-const getUserScore = (id) => users.find(u => u.user_id === id)?.score || 0
 const getCampus = (campus) => campus + '校区'
 </script>

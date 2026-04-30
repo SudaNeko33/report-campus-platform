@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-6">
       <h1 class="text-2xl font-bold text-gray-900">管理后台</h1>
       <div class="flex items-center space-x-4">
-        <button 
+        <button
           @click="handleResetData"
           class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors flex items-center"
         >
@@ -60,12 +60,12 @@
       </div>
     </div>
     <div class="bg-white rounded-lg shadow-sm">
-      <div 
+      <div
         class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
         @click="collapsePendingGoods = !collapsePendingGoods"
       >
         <h2 class="font-semibold text-gray-900">待审核商品</h2>
-        <ChevronDown 
+        <ChevronDown
           class="h-5 w-5 text-gray-400 transition-transform duration-200"
           :class="{ 'rotate-180': !collapsePendingGoods }"
         />
@@ -107,13 +107,13 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex space-x-2">
-                  <button 
+                  <button
                     @click="handleApprove(good.goods_id)"
                     class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
                   >
                     审核通过
                   </button>
-                  <button 
+                  <button
                     @click="handleReject(good.goods_id)"
                     class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
                   >
@@ -134,12 +134,12 @@
       </transition>
     </div>
     <div class="mt-6 bg-white rounded-lg shadow-sm">
-      <div 
+      <div
         class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
         @click="collapseAllGoods = !collapseAllGoods"
       >
         <h2 class="font-semibold text-gray-900">所有商品列表</h2>
-        <ChevronDown 
+        <ChevronDown
           class="h-5 w-5 text-gray-400 transition-transform duration-200"
           :class="{ 'rotate-180': !collapseAllGoods }"
         />
@@ -197,21 +197,21 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ good.create_time }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex space-x-2">
-                  <button 
+                  <button
                     v-if="good.status === '已上架'"
                     @click="toggleGoodStatus(good.goods_id, '下架')"
                     class="px-3 py-1 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700 transition-colors"
                   >
                     下架
                   </button>
-                  <button 
+                  <button
                     v-else-if="good.status === '已下架'"
                     @click="toggleGoodStatus(good.goods_id, '上架')"
                     class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
                   >
                     上架
                   </button>
-                  <button 
+                  <button
                     @click="deleteGood(good.goods_id)"
                     class="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
                   >
@@ -233,12 +233,12 @@
     </div>
 
     <div class="mt-6 bg-white rounded-lg shadow-sm">
-      <div 
+      <div
         class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
         @click="collapseOrders = !collapseOrders"
       >
         <h2 class="font-semibold text-gray-900">所有订单列表</h2>
-        <ChevronDown 
+        <ChevronDown
           class="h-5 w-5 text-gray-400 transition-transform duration-200"
           :class="{ 'rotate-180': !collapseOrders }"
         />
@@ -305,12 +305,12 @@
     </div>
 
     <div class="mt-6 bg-white rounded-lg shadow-sm">
-      <div 
+      <div
         class="border-b border-gray-200 px-6 py-4 cursor-pointer flex items-center justify-between"
         @click="collapseUsers = !collapseUsers"
       >
         <h2 class="font-semibold text-gray-900">用户管理</h2>
-        <ChevronDown 
+        <ChevronDown
           class="h-5 w-5 text-gray-400 transition-transform duration-200"
           :class="{ 'rotate-180': !collapseUsers }"
         />
@@ -319,9 +319,9 @@
         <div v-show="!collapseUsers">
           <div class="px-6 py-4 flex items-center justify-between bg-gray-50">
             <div class="relative">
-              <input 
+              <input
                 v-model="userSearchKeyword"
-                type="text" 
+                type="text"
                 placeholder="搜索用户名/姓名/学号..."
                 class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
@@ -369,7 +369,7 @@
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
                       <Star class="h-4 w-4 text-yellow-400" />
-                      <span class="ml-1 text-gray-900">{{ user.score }}</span>
+                      <span class="ml-1 text-gray-900">{{ getUserScore(user.user_id) }}</span>
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
@@ -381,18 +381,18 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.create_time }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex space-x-2">
-                      <button 
+                      <button
                         @click="openEditModal(user)"
                         class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                       >
                         编辑
                       </button>
-                      <button 
+                      <button
                         @click="toggleUserStatus(user.user_id, user.status)"
                         :class="[
                           'px-4 py-2 text-sm rounded-lg transition-colors',
-                          user.status === '正常' 
-                            ? 'bg-red-600 text-white hover:bg-red-700' 
+                          user.status === '正常'
+                            ? 'bg-red-600 text-white hover:bg-red-700'
                             : 'bg-green-600 text-white hover:bg-green-700'
                         ]"
                       >
@@ -414,27 +414,22 @@
         </transition>
     </div>
 
-    <div 
-      v-if="showEditModal" 
+    <div
+      v-if="showEditModal"
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       @click.self="closeEditModal"
     >
       <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h3 class="text-lg font-semibold text-gray-900">编辑用户信息</h3>
-          <button 
-            @click="closeEditModal"
-            class="text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <button @click="closeEditModal" class="text-gray-400 hover:text-gray-600">
+            <X class="h-5 w-5" />
           </button>
         </div>
         <div class="px-6 py-4 space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
-            <input 
+            <input
               v-model="editingUser.username"
               type="text"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -442,7 +437,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">真实姓名</label>
-            <input 
+            <input
               v-model="editingUser.real_name"
               type="text"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -450,7 +445,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
-            <input 
+            <input
               v-model="editingUser.student_id"
               type="text"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -458,7 +453,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">联系方式</label>
-            <input 
+            <input
               v-model="editingUser.contact"
               type="text"
               placeholder="微信/QQ账号"
@@ -467,7 +462,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">角色</label>
-            <select 
+            <select
               v-model="editingUser.role"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
@@ -475,27 +470,16 @@
               <option value="管理员">管理员</option>
             </select>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">评分</label>
-            <input 
-              v-model.number="editingUser.score"
-              type="number"
-              min="0"
-              max="5"
-              step="0.1"
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
 
         </div>
         <div class="flex items-center justify-end px-6 py-4 border-t border-gray-200 space-x-3">
-          <button 
+          <button
             @click="closeEditModal"
             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
             取消
           </button>
-          <button 
+          <button
             @click="saveUser"
             class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
@@ -509,8 +493,8 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
-import { Package, Clock, Users, ShoppingCart, User, Star, Search, ChevronDown, RefreshCw } from 'lucide-vue-next'
-import { goods, users, categories, orders, resetData } from '../data/store'
+import { Package, Clock, Users, ShoppingCart, User, Star, Search, ChevronDown, RefreshCw, X } from 'lucide-vue-next'
+import { goods, users, categories, orders, comments, resetData, getUserScore } from '../data/store'
 
 const userSearchKeyword = ref('')
 const showEditModal = ref(false)
@@ -525,7 +509,6 @@ const editingUser = reactive({
   student_id: '',
   contact: '',
   role: '学生',
-  score: 5.0,
   status: '正常'
 })
 
@@ -534,7 +517,7 @@ const pendingGoods = computed(() => goods.filter(g => g.status === '待审核').
 const filteredUsers = computed(() => {
   if (!userSearchKeyword.value) return users
   const keyword = userSearchKeyword.value.toLowerCase()
-  return users.filter(user => 
+  return users.filter(user =>
     user.username.toLowerCase().includes(keyword) ||
     user.real_name.toLowerCase().includes(keyword) ||
     user.student_id.toLowerCase().includes(keyword)
@@ -580,7 +563,6 @@ const openEditModal = (user) => {
   editingUser.student_id = user.student_id
   editingUser.contact = user.contact || ''
   editingUser.role = user.role
-  editingUser.score = user.score
   editingUser.status = user.status
   showEditModal.value = true
 }
@@ -597,7 +579,6 @@ const saveUser = () => {
     user.student_id = editingUser.student_id
     user.contact = editingUser.contact
     user.role = editingUser.role
-    user.score = editingUser.score
     alert(`用户 "${user.username}" (${user.real_name}) 信息已更新！`)
     closeEditModal()
   }
@@ -616,47 +597,19 @@ const toggleGoodStatus = (id, action) => {
   }
 }
 
+const deleteGood = (id) => {
+  if (confirm('确定要删除该商品吗？')) {
+    const index = goods.findIndex(g => g.goods_id === id)
+    if (index !== -1) {
+      goods.splice(index, 1)
+    }
+  }
+}
+
 const handleResetData = () => {
   if (confirm('确定要重置所有数据吗？这将清空所有用户、商品、订单和评论数据，恢复到初始状态！此操作不可恢复！')) {
     resetData()
     location.reload()
   }
 }
-
-const deleteGood = (id) => {
-  const good = goods.find(g => g.goods_id === id)
-  if (good) {
-    if (confirm(`确定要永久删除商品 "${good.goods_name}" 吗？此操作不可恢复！`)) {
-      const index = goods.findIndex(g => g.goods_id === id)
-      if (index !== -1) {
-        goods.splice(index, 1)
-        alert(`商品已永久删除！`)
-      }
-    }
-  }
-}
 </script>
-
-<style scoped>
-.collapse-enter-active,
-.collapse-leave-active {
-  transition: all 0.2s ease;
-  overflow: hidden;
-}
-
-.collapse-enter-from,
-.collapse-leave-to {
-  max-height: 0;
-  opacity: 0;
-}
-
-.collapse-enter-to,
-.collapse-leave-from {
-  max-height: 2000px;
-  opacity: 1;
-}
-
-.rotate-180 {
-  transform: rotate(180deg);
-}
-</style>
