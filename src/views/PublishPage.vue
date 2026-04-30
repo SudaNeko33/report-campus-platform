@@ -106,9 +106,12 @@
 <script setup>
 import { reactive } from 'vue'
 import { ImagePlus } from 'lucide-vue-next'
-import { categories, campusOptions } from '../data/store'
+import { categories, campusOptions, goods } from '../data/store'
+import { useUser } from '../composables/useUser'
 
 defineEmits(['back'])
+
+const { currentUser } = useUser()
 
 const form = reactive({
   goods_name: '',
@@ -120,10 +123,33 @@ const form = reactive({
 })
 
 const handleSubmit = () => {
+  if (!currentUser.value) {
+    alert('请先登录！')
+    return
+  }
+  
   if (!form.images) {
     form.images = 'https://neeko-copilot.bytedance.net/api/text_to_image?prompt=secondhand%20goods%20product%20photo&image_size=square'
   }
+  
+  const newGoods = {
+    goods_id: goods.length > 0 ? Math.max(...goods.map(g => g.goods_id)) + 1 : 1,
+    user_id: currentUser.value.user_id,
+    category_id: form.category_id,
+    goods_name: form.goods_name,
+    description: form.description,
+    price: form.price,
+    images: form.images,
+    campus: form.campus,
+    status: '待审核',
+    create_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    update_time: new Date().toISOString().slice(0, 19).replace('T', ' ')
+  }
+  
+  goods.push(newGoods)
+  
   alert('商品发布成功！等待审核')
+  
   form.goods_name = ''
   form.category_id = ''
   form.description = ''
