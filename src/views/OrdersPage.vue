@@ -38,7 +38,9 @@
               <img :src="getGoods(order.goods_id)?.images" :alt="getGoods(order.goods_id)?.goods_name" class="w-full h-full object-cover" />
             </div>
             <div class="flex-1">
-              <h3 class="font-medium text-gray-900 mb-2">{{ getGoods(order.goods_id)?.goods_name }}</h3>
+              <router-link :to="'/detail/' + order.goods_id" class="block font-medium text-gray-900 mb-2 hover:text-primary-600 transition-colors">
+                {{ getGoods(order.goods_id)?.goods_name }}
+              </router-link>
               <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
                 <span>卖家：{{ getUserName(order.seller_id) }}</span>
                 <span>买家：{{ getUserName(order.buyer_id) }}</span>
