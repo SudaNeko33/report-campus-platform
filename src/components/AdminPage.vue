@@ -147,6 +147,7 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">价格</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布时间</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -185,9 +186,33 @@
                 ]">{{ good.status }}</span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ good.create_time }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex space-x-2">
+                  <button 
+                    v-if="good.status === '已上架'"
+                    @click="toggleGoodStatus(good.goods_id, '下架')"
+                    class="px-3 py-1 bg-yellow-600 text-white text-sm rounded-lg hover:bg-yellow-700 transition-colors"
+                  >
+                    下架
+                  </button>
+                  <button 
+                    v-else-if="good.status === '已下架'"
+                    @click="toggleGoodStatus(good.goods_id, '上架')"
+                    class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    上架
+                  </button>
+                  <button 
+                    @click="deleteGood(good.goods_id)"
+                    class="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                  >
+                    删除
+                  </button>
+                </div>
+              </td>
             </tr>
             <tr v-if="goods.length === 0">
-              <td colspan="7" class="px-6 py-8 text-center">
+              <td colspan="8" class="px-6 py-8 text-center">
                 <Package class="h-12 w-12 text-gray-300 mx-auto mb-2" />
                 <p class="text-gray-500">暂无商品</p>
               </td>
@@ -566,6 +591,32 @@ const saveUser = () => {
     user.score = editingUser.score
     alert(`用户 "${user.username}" (${user.real_name}) 信息已更新！`)
     closeEditModal()
+  }
+}
+
+const toggleGoodStatus = (id, action) => {
+  const good = goods.find(g => g.goods_id === id)
+  if (good) {
+    if (action === '上架') {
+      good.status = '已上架'
+      alert(`商品 "${good.goods_name}" 已上架！`)
+    } else if (action === '下架') {
+      good.status = '已下架'
+      alert(`商品 "${good.goods_name}" 已下架！`)
+    }
+  }
+}
+
+const deleteGood = (id) => {
+  const good = goods.find(g => g.goods_id === id)
+  if (good) {
+    if (confirm(`确定要永久删除商品 "${good.goods_name}" 吗？此操作不可恢复！`)) {
+      const index = goods.findIndex(g => g.goods_id === id)
+      if (index !== -1) {
+        goods.splice(index, 1)
+        alert(`商品已永久删除！`)
+      }
+    }
   }
 }
 </script>
