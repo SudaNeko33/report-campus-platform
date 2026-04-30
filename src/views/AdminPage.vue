@@ -90,7 +90,9 @@
                     <img :src="good.images" :alt="good.goods_name" class="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <p class="font-medium text-gray-900">{{ good.goods_name }}</p>
+                    <router-link :to="`/detail/${good.goods_id}`" class="font-medium text-gray-900 hover:text-blue-600">
+                      {{ good.goods_name }}
+                    </router-link>
                     <p class="text-sm text-gray-500">{{ getCategoryName(good.category_id) }}</p>
                   </div>
                 </div>
@@ -167,7 +169,9 @@
                       <img :src="good.images" :alt="good.goods_name" class="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <p class="font-medium text-gray-900">{{ good.goods_name }}</p>
+                      <router-link :to="`/detail/${good.goods_id}`" class="font-medium text-gray-900 hover:text-blue-600">
+                        {{ good.goods_name }}
+                      </router-link>
                       <p class="text-sm text-gray-500 line-clamp-1">{{ good.description }}</p>
                     </div>
                   </div>
@@ -267,7 +271,9 @@
                       <img :src="getGoodsImage(order.goods_id)" :alt="getGoodsName(order.goods_id)" class="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <p class="font-medium text-gray-900">{{ getGoodsName(order.goods_id) }}</p>
+                      <router-link :to="`/detail/${order.goods_id}`" class="font-medium text-gray-900 hover:text-blue-600">
+                        {{ getGoodsName(order.goods_id) }}
+                      </router-link>
                       <p class="text-sm text-red-500">¥{{ getGoodsPrice(order.goods_id) }}</p>
                     </div>
                   </div>
@@ -348,7 +354,9 @@
                 <tr v-for="user in filteredUsers" :key="user.user_id">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.user_id }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <p class="font-medium text-gray-900">{{ user.username }}</p>
+                    <router-link :to="`/profile/${user.user_id}`" class="font-medium text-gray-900 hover:text-blue-600">
+                      {{ user.username }}
+                    </router-link>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex items-center">
