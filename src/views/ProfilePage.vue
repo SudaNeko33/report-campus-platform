@@ -67,7 +67,8 @@
           <div
             v-for="good in myGoods"
             :key="good.goods_id"
-            class="flex space-x-4 p-4 bg-gray-50 rounded-lg"
+            class="flex space-x-4 p-4 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition"
+            @click="goToDetail(good.goods_id)"
           >
             <div class="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
               <img :src="good.images" :alt="good.goods_name" class="w-full h-full object-cover" />
@@ -133,13 +134,14 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { User, Star, Package, ShoppingCart, MessageSquare } from 'lucide-vue-next'
 import { users, goods, orders, comments, getUserScore } from '../data/store'
 import { useUser } from '../composables/useUser'
 
 const { currentUser } = useUser()
 const route = useRoute()
+const router = useRouter()
 
 const targetUserId = computed(() => {
   if (route.params.userId) {
@@ -204,4 +206,8 @@ const maskStudentId = (studentId) => {
 }
 
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
+
+const goToDetail = (goodsId) => {
+  router.push(`/detail/${goodsId}`)
+}
 </script>
