@@ -75,6 +75,28 @@ export function useUser() {
     localStorage.removeItem('currentUser')
   }
 
+  const updateUsername = (newUsername) => {
+    if (!currentUser.value) {
+      return { success: false, message: '未登录' }
+    }
+
+    const existingUser = users.find(u => u.username === newUsername && u.user_id !== currentUser.value.user_id)
+    if (existingUser) {
+      return { success: false, message: '用户名已存在' }
+    }
+
+    const userIndex = users.findIndex(u => u.user_id === currentUser.value.user_id)
+    if (userIndex === -1) {
+      return { success: false, message: '用户不存在' }
+    }
+
+    users[userIndex].username = newUsername
+    currentUser.value = { ...users[userIndex] }
+    localStorage.setItem('currentUser', JSON.stringify(currentUser.value))
+
+    return { success: true, message: '用户名修改成功', user: currentUser.value }
+  }
+
   const checkAuth = () => {
     const storedUser = localStorage.getItem('currentUser')
     if (storedUser) {
@@ -92,6 +114,7 @@ export function useUser() {
     login,
     register,
     logout,
+    updateUsername,
     checkAuth
   }
 }

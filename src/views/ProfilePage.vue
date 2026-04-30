@@ -11,7 +11,37 @@
           <User class="h-12 w-12 text-primary-600" />
         </div>
         <div>
-          <h1 class="text-2xl font-bold">{{ targetUser.username }}</h1>
+          <div v-if="isEditingUsername" class="flex items-center space-x-2">
+            <input
+              v-model="editedUsername"
+              type="text"
+              class="text-2xl font-bold bg-white text-gray-900 border border-primary-500 rounded px-3 py-0 focus:outline-none focus:ring-2 focus:ring-primary-500 leading-tight"
+              @keyup.enter="saveUsername"
+              @keyup.escape="cancelEditUsername"
+            />
+            <button
+              @click="saveUsername"
+              class="p-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
+            >
+              <Check class="h-5 w-5" />
+            </button>
+            <button
+              @click="cancelEditUsername"
+              class="p-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition"
+            >
+              <X class="h-5 w-5" />
+            </button>
+          </div>
+          <div v-else class="flex items-center space-x-2">
+            <h1 class="text-2xl font-bold">{{ targetUser.username }}</h1>
+            <button
+              v-if="isOwner"
+              @click="startEditUsername"
+              class="p-1 text-white hover:bg-primary-500 rounded transition"
+            >
+              <Pencil class="h-5 w-5" />
+            </button>
+          </div>
           <p class="text-primary-100 mt-1">{{ isOwner ? targetUser.real_name : maskRealName(targetUser.real_name) }}</p>
           <div class="flex items-center space-x-4 mt-2">
             <div class="flex items-center">
@@ -133,15 +163,18 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { User, Star, Package, ShoppingCart, MessageSquare } from 'lucide-vue-next'
+import { User, Star, Package, ShoppingCart, MessageSquare, Pencil, Check, X } from 'lucide-vue-next'
 import { users, goods, orders, comments, getUserScore } from '../data/store'
 import { useUser } from '../composables/useUser'
 
-const { currentUser } = useUser()
+const { currentUser, updateUsername } = useUser()
 const route = useRoute()
 const router = useRouter()
+
+const isEditingUsername = ref(false)
+const editedUsername = ref('')
 
 const targetUserId = computed(() => {
   if (route.params.userId) {
@@ -158,6 +191,30 @@ const targetUser = computed(() => {
 const isOwner = computed(() => {
   return currentUser.value && targetUser.value && currentUser.value.user_id === targetUser.value.user_id
 })
+
+const startEditUsername = () => {
+  if (!isOwner.value) return
+  editedUsername.value = targetUser.value.username
+  isEditingUsername.value = true
+}
+
+const cancelEditUsername = () => {
+  isEditingUsername.value = false
+  editedUsername.value = ''
+}
+
+const saveUsername = () => {
+  if (!editedUsername.value.trim()) {
+    return
+  }
+  const result = updateUsername(editedUsername.value.trim())
+  if (result.success) {
+    isEditingUsername.value = false
+    editedUsername.value = ''
+  } else {
+    alert(result.message)
+  }
+}
 
 const myGoods = computed(() => {
   if (!targetUser.value) return []
