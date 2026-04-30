@@ -166,7 +166,7 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full">{{ getCategoryName(good.category_id) }}</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4 whitespace-nowrap min-w-[100px]">
                   <p class="text-sm text-gray-900">{{ getUserName(good.user_id) }}</p>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
