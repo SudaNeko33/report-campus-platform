@@ -49,19 +49,25 @@
                 <span class="text-lg font-bold text-red-500">¥{{ getGoods(order.goods_id)?.price }}</span>
                 <div class="flex space-x-2">
                   <button
-                    v-if="order.status === '待交易'"
+                    v-if="order.status === '待交易' || order.status === '等待买家确认' || order.status === '等待卖家确认'"
                     @click="showContact(order)"
                     class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
                   >
                     查看联系方式
                   </button>
                   <button
-                    v-if="order.status === '待交易'"
+                    v-if="canConfirm(order)"
                     @click="handleComplete(order.order_id)"
                     class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
                   >
                     确认完成
                   </button>
+                  <span
+                    v-if="hasConfirmed(order) && order.status !== '已完成'"
+                    class="px-4 py-2 bg-gray-100 text-gray-500 text-sm rounded-lg"
+                  >
+                    已确认
+                  </span>
                   <button
                     v-if="order.status === '待交易'"
                     @click="handleCancel(order.order_id)"
@@ -130,6 +136,23 @@
           <button
             @click="closeContactModal"
             class="w-full mt-6 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            我知道了
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showSuccessModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="p-6 text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Check class="h-8 w-8 text-green-600" />
+          </div>
+          <p class="text-lg font-medium text-gray-900 mb-6">{{ successModalMessage }}</p>
+          <button
+            @click="showSuccessModal = false"
+            class="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             我知道了
           </button>
@@ -206,7 +229,7 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
-import { Package, X, User, MessageCircle } from 'lucide-vue-next'
+import { Package, X, User, MessageCircle, Check } from 'lucide-vue-next'
 import { orders, goods, users, comments } from '../data/store'
 
 const props = defineProps({
@@ -219,6 +242,8 @@ const props = defineProps({
 const activeTab = ref('all')
 const showCommentModal = ref(false)
 const showContactModal = ref(false)
+const showSuccessModal = ref(false)
+const successModalMessage = ref('')
 
 const contactModalData = reactive({
   title: '',
@@ -266,7 +291,7 @@ const userOrders = computed(() => {
 
 const filteredOrders = computed(() => {
   if (activeTab.value === 'all') return userOrders.value
-  if (activeTab.value === 'pending') return userOrders.value.filter(o => o.status === '待交易')
+  if (activeTab.value === 'pending') return userOrders.value.filter(o => o.status === '待交易' || o.status === '等待买家确认' || o.status === '等待卖家确认')
   if (activeTab.value === 'completed') return userOrders.value.filter(o => o.status === '已完成' || o.status === '已评价')
   if (activeTab.value === 'cancelled') return userOrders.value.filter(o => o.status === '已取消')
   return userOrders.value
@@ -274,7 +299,7 @@ const filteredOrders = computed(() => {
 
 const getTabCount = (key) => {
   if (key === 'all') return userOrders.value.length
-  if (key === 'pending') return userOrders.value.filter(o => o.status === '待交易').length
+  if (key === 'pending') return userOrders.value.filter(o => o.status === '待交易' || o.status === '等待买家确认' || o.status === '等待卖家确认').length
   if (key === 'completed') return userOrders.value.filter(o => o.status === '已完成' || o.status === '已评价').length
   if (key === 'cancelled') return userOrders.value.filter(o => o.status === '已取消').length
   return 0
@@ -301,6 +326,8 @@ const getBuyerName = (id) => {
 const getStatusClass = (status) => {
   switch (status) {
     case '待交易': return 'text-yellow-600'
+    case '等待买家确认': return 'text-orange-600'
+    case '等待卖家确认': return 'text-orange-600'
     case '已完成': return 'text-green-600'
     case '已评价': return 'text-blue-600'
     case '已取消': return 'text-gray-500'
@@ -315,15 +342,50 @@ const hasCommented = (orderId) => {
   return comments.some(c => c.order_id === orderId && c.from_uid === userId)
 }
 
+const canConfirm = (order) => {
+  const userId = props.currentUser.user_id
+  if (order.status === '已完成' || order.status === '已取消' || order.status === '已评价') return false
+  if (order.buyer_id === userId) return !order.buyer_confirmed
+  if (order.seller_id === userId) return !order.seller_confirmed
+  return false
+}
+
+const hasConfirmed = (order) => {
+  const userId = props.currentUser.user_id
+  if (order.buyer_id === userId) return order.buyer_confirmed
+  if (order.seller_id === userId) return order.seller_confirmed
+  return false
+}
+
 const handleComplete = (id) => {
   const order = orders.find(o => o.order_id === id)
   if (order) {
-    order.status = '已完成'
-    order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
-
-    const good = goods.find(g => g.goods_id === order.goods_id)
-    if (good) {
-      good.status = '已售出'
+    const userId = props.currentUser.user_id
+    const isBuyer = userId === order.buyer_id
+    
+    if (isBuyer) {
+      order.buyer_confirmed = true
+    } else {
+      order.seller_confirmed = true
+    }
+    
+    if (order.buyer_confirmed && order.seller_confirmed) {
+      order.status = '已完成'
+      order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+      const good = goods.find(g => g.goods_id === order.goods_id)
+      if (good) {
+        good.status = '已售出'
+      }
+      successModalMessage.value = '订单已完成！'
+      showSuccessModal.value = true
+    } else if (isBuyer) {
+      order.status = '等待卖家确认'
+      successModalMessage.value = '已确认，等待卖家确认！'
+      showSuccessModal.value = true
+    } else {
+      order.status = '等待买家确认'
+      successModalMessage.value = '已确认，等待买家确认！'
+      showSuccessModal.value = true
     }
   }
 }
@@ -332,6 +394,8 @@ const handleCancel = (id) => {
   const order = orders.find(o => o.order_id === id)
   if (order) {
     order.status = '已取消'
+    order.buyer_confirmed = false
+    order.seller_confirmed = false
     order.finish_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
 
     const good = goods.find(g => g.goods_id === order.goods_id)

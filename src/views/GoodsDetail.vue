@@ -357,6 +357,8 @@ const confirmBuy = () => {
     buyer_id: currentUser.value.user_id,
     seller_id: goods.value.user_id,
     status: '待交易',
+    buyer_confirmed: false,
+    seller_confirmed: false,
     create_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
     finish_time: null
   }
