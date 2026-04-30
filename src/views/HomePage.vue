@@ -149,6 +149,6 @@ const filteredGoods = computed(() => {
 })
 
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
-const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
+const getUserName = (id) => users.find(u => u.user_id === id)?.username || '未知用户'
 const getCampus = (campus) => campus + '校区'
 </script>

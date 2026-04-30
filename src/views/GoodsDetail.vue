@@ -251,8 +251,12 @@ const statusClass = computed(() => {
 })
 
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
-const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
-const getUserStudentId = (id) => users.find(u => u.user_id === id)?.student_id || ''
+const getUserName = (id) => users.find(u => u.user_id === id)?.username || '未知用户'
+const getUserStudentId = (id) => {
+  const studentId = users.find(u => u.user_id === id)?.student_id || ''
+  if (!studentId || studentId.length <= 2) return studentId
+  return studentId.substring(0, 2) + '*'.repeat(studentId.length - 2)
+}
 
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
 

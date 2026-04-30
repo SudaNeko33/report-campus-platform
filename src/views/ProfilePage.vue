@@ -12,13 +12,13 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold">{{ targetUser.username }}</h1>
-          <p class="text-primary-100 mt-1">{{ targetUser.real_name }}</p>
+          <p class="text-primary-100 mt-1">{{ isOwner ? targetUser.real_name : maskRealName(targetUser.real_name) }}</p>
           <div class="flex items-center space-x-4 mt-2">
             <div class="flex items-center">
               <Star class="h-5 w-5 text-yellow-400" />
               <span class="ml-1">{{ getUserScore(targetUser.user_id) }}</span>
             </div>
-            <span>{{ targetUser.student_id }}</span>
+            <span>{{ isOwner ? targetUser.student_id : maskStudentId(targetUser.student_id) }}</span>
           </div>
         </div>
       </div>
@@ -153,12 +153,15 @@ const targetUser = computed(() => {
   return users.find(u => u.user_id === targetUserId.value)
 })
 
+const isOwner = computed(() => {
+  return currentUser.value && targetUser.value && currentUser.value.user_id === targetUser.value.user_id
+})
+
 const myGoods = computed(() => {
   if (!targetUser.value) return []
-  const isOwner = currentUser.value && currentUser.value.user_id === targetUser.value.user_id
   const userGoods = goods.filter(g => g.user_id === targetUser.value.user_id)
 
-  if (isOwner) {
+  if (isOwner.value) {
     return userGoods
   }
 
@@ -188,6 +191,16 @@ const getStatusClass = (status) => {
     case '暂存（已联系）': return 'bg-blue-100 text-blue-700'
     default: return 'bg-gray-100 text-gray-700'
   }
+}
+
+const maskRealName = (realName) => {
+  if (!realName || realName.length <= 1) return realName
+  return realName[0] + '*'.repeat(realName.length - 1)
+}
+
+const maskStudentId = (studentId) => {
+  if (!studentId || studentId.length <= 2) return studentId
+  return studentId.substring(0, 2) + '*'.repeat(studentId.length - 2)
 }
 
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
