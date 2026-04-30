@@ -54,15 +54,7 @@
           <div class="flex space-x-4">
             <button
               v-if="!isOwner && goods.status === '已上架'"
-              @click="handleContact"
-              class="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-            >
-              <MessageCircle class="h-5 w-5" />
-              <span>联系卖家</span>
-            </button>
-            <button
-              v-if="!isOwner && goods.status === '已上架'"
-              @click="handleBuy"
+              @click="showConfirmModal = true"
               class="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
             >
               <ShoppingCart class="h-5 w-5" />
@@ -193,6 +185,83 @@
         </form>
       </div>
     </div>
+
+    <div v-if="showConfirmModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="border-b border-gray-200 px-6 py-4">
+          <h2 class="font-semibold text-gray-900">确认购买</h2>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center space-x-4 mb-6">
+            <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+              <img :src="goods?.images" :alt="goods?.goods_name" class="w-full h-full object-cover" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">{{ goods?.goods_name }}</p>
+              <p class="text-red-500 font-bold text-lg">¥{{ goods?.price }}</p>
+            </div>
+          </div>
+          <p class="text-gray-600 mb-6">确认购买此商品？确认后将与卖家交换联系方式。</p>
+          <div class="flex space-x-4">
+            <button
+              @click="showConfirmModal = false"
+              class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              取消
+            </button>
+            <button
+              @click="confirmBuy"
+              class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+            >
+              确认购买
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h2 class="font-semibold text-gray-900">卖家联系方式</h2>
+          <button @click="showContactModal = false" class="text-gray-400 hover:text-gray-600">
+            <X class="h-5 w-5" />
+          </button>
+        </div>
+        <div class="p-6">
+          <div class="bg-green-50 rounded-lg p-4 mb-6">
+            <p class="text-green-700 font-medium mb-2">订单已创建！</p>
+            <p class="text-green-600 text-sm">商品状态已更新为"暂存（已联系）"</p>
+          </div>
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                <User class="h-5 w-5 text-primary-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">卖家</p>
+                <p class="font-medium text-gray-900">{{ maskName(getUserName(goods?.user_id)) }}</p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                <MessageCircle class="h-5 w-5 text-primary-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">联系方式</p>
+                <p class="font-medium text-gray-900">{{ sellerContact }}</p>
+              </div>
+            </div>
+          </div>
+          <button
+            @click="showContactModal = false"
+            class="w-full mt-6 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            我知道了
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -200,13 +269,15 @@
 import { ref, computed, reactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowLeft, User, Star, MessageCircle, ShoppingCart, Edit, Trash2, X, ExternalLink } from 'lucide-vue-next'
-import { goods as goodsData, categories, users, campusOptions, getUserScore } from '../data/store'
+import { goods as goodsData, categories, users, orders, campusOptions, getUserScore } from '../data/store'
 import { useUser } from '../composables/useUser'
 
 const { currentUser } = useUser()
 const route = useRoute()
 
 const showEditModal = ref(false)
+const showConfirmModal = ref(false)
+const showContactModal = ref(false)
 
 const goods = computed(() => {
   const id = parseInt(route.params.id)
@@ -251,22 +322,48 @@ const statusClass = computed(() => {
 })
 
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
-const getUserName = (id) => users.find(u => u.user_id === id)?.username || '未知用户'
+const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
+
+const maskName = (name) => {
+  if (!name || name.length <= 1) return name
+  return name[0] + '*'.repeat(name.length - 1)
+}
 const getUserStudentId = (id) => {
   const studentId = users.find(u => u.user_id === id)?.student_id || ''
   if (!studentId || studentId.length <= 2) return studentId
   return studentId.substring(0, 2) + '*'.repeat(studentId.length - 2)
 }
 
+const sellerContact = computed(() => {
+  if (!goods.value) return ''
+  const user = users.find(u => u.user_id === goods.value.user_id)
+  return user?.contact || '未提供'
+})
+
 const formatTime = (time) => new Date(time).toLocaleString('zh-CN')
 
-const handleContact = () => {
-  const user = users.find(u => u.user_id === goods.value.user_id)
-  alert(`卖家联系方式：${user?.contact || '未提供'}`)
-}
+const confirmBuy = () => {
+  showConfirmModal.value = false
+  
+  const good = goodsData.find(g => g.goods_id === goods.value.goods_id)
+  if (good) {
+    good.status = '暂存（已联系）'
+    good.update_time = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  }
 
-const handleBuy = () => {
-  alert('订单已创建，请等待卖家确认！')
+  const newOrder = {
+    order_id: orders.length > 0 ? Math.max(...orders.map(o => o.order_id)) + 1 : 1,
+    goods_id: goods.value.goods_id,
+    buyer_id: currentUser.value.user_id,
+    seller_id: goods.value.user_id,
+    status: '待交易',
+    create_time: new Date().toISOString().slice(0, 19).replace('T', ' '),
+    finish_time: null
+  }
+
+  orders.push(newOrder)
+
+  showContactModal.value = true
 }
 
 const openEditModal = () => {

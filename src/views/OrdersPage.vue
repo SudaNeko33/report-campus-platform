@@ -42,12 +42,19 @@
                 {{ getGoods(order.goods_id)?.goods_name }}
               </router-link>
               <div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
-                <span>卖家：{{ getUserName(order.seller_id) }}</span>
-                <span>买家：{{ getUserName(order.buyer_id) }}</span>
+                <span>卖家：{{ getSellerName(order.seller_id) }}</span>
+                <span>买家：{{ getBuyerName(order.buyer_id) }}</span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-lg font-bold text-red-500">¥{{ getGoods(order.goods_id)?.price }}</span>
                 <div class="flex space-x-2">
+                  <button
+                    v-if="order.status === '待交易'"
+                    @click="showContact(order)"
+                    class="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                  >
+                    查看联系方式
+                  </button>
                   <button
                     v-if="order.status === '待交易'"
                     @click="handleComplete(order.order_id)"
@@ -87,6 +94,45 @@
         <div v-if="filteredOrders.length === 0" class="bg-white rounded-lg shadow-sm p-12 text-center">
           <Package class="h-16 w-16 text-gray-300 mx-auto mb-4" />
           <p class="text-gray-500">暂无{{ tabs.find(t => t.key === activeTab)?.label }}订单</p>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showContactModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+        <div class="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <h2 class="font-semibold text-gray-900">{{ contactModalTitle }}</h2>
+          <button @click="closeContactModal" class="text-gray-400 hover:text-gray-600">
+            <X class="h-5 w-5" />
+          </button>
+        </div>
+        <div class="p-6">
+          <div class="space-y-3">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                <User class="h-5 w-5 text-primary-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">{{ contactModalRole }}</p>
+                <p class="font-medium text-gray-900">{{ contactModalName }}</p>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                <MessageCircle class="h-5 w-5 text-primary-600" />
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">联系方式</p>
+                <p class="font-medium text-gray-900">{{ contactModalContact }}</p>
+              </div>
+            </div>
+          </div>
+          <button
+            @click="closeContactModal"
+            class="w-full mt-6 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+          >
+            我知道了
+          </button>
         </div>
       </div>
     </div>
@@ -160,7 +206,7 @@
 
 <script setup>
 import { ref, computed, reactive } from 'vue'
-import { Package, X } from 'lucide-vue-next'
+import { Package, X, User, MessageCircle } from 'lucide-vue-next'
 import { orders, goods, users, comments } from '../data/store'
 
 const props = defineProps({
@@ -172,6 +218,19 @@ const props = defineProps({
 
 const activeTab = ref('all')
 const showCommentModal = ref(false)
+const showContactModal = ref(false)
+
+const contactModalData = reactive({
+  title: '',
+  role: '',
+  name: '',
+  contact: ''
+})
+
+const contactModalTitle = computed(() => contactModalData.title)
+const contactModalRole = computed(() => contactModalData.role)
+const contactModalName = computed(() => contactModalData.name)
+const contactModalContact = computed(() => contactModalData.contact)
 
 const commentForm = reactive({
   order_id: null,
@@ -224,6 +283,21 @@ const getTabCount = (key) => {
 const getGoods = (id) => goods.find(g => g.goods_id === id)
 const getUserName = (id) => users.find(u => u.user_id === id)?.real_name || '未知用户'
 
+const maskName = (name) => {
+  if (!name || name.length <= 1) return name
+  return name[0] + '*'.repeat(name.length - 1)
+}
+
+const getSellerName = (id) => {
+  if (id === props.currentUser.user_id) return '您'
+  return maskName(getUserName(id))
+}
+
+const getBuyerName = (id) => {
+  if (id === props.currentUser.user_id) return '您'
+  return maskName(getUserName(id))
+}
+
 const getStatusClass = (status) => {
   switch (status) {
     case '待交易': return 'text-yellow-600'
@@ -267,6 +341,31 @@ const handleCancel = (id) => {
 
     alert(`订单 ${id} 已取消！`)
   }
+}
+
+const showContact = (order) => {
+  const userId = props.currentUser.user_id
+  const isBuyer = userId === order.buyer_id
+  
+  if (isBuyer) {
+    const seller = users.find(u => u.user_id === order.seller_id)
+    contactModalData.title = '卖家联系方式'
+    contactModalData.role = '卖家'
+    contactModalData.name = seller?.user_id === userId ? '您' : maskName(seller?.real_name || '未知用户')
+    contactModalData.contact = seller?.contact || '未提供'
+  } else {
+    const buyer = users.find(u => u.user_id === order.buyer_id)
+    contactModalData.title = '买家联系方式'
+    contactModalData.role = '买家'
+    contactModalData.name = buyer?.user_id === userId ? '您' : maskName(buyer?.real_name || '未知用户')
+    contactModalData.contact = buyer?.contact || '未提供'
+  }
+  
+  showContactModal.value = true
+}
+
+const closeContactModal = () => {
+  showContactModal.value = false
 }
 
 const handleComment = (id) => {
