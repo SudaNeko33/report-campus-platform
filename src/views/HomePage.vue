@@ -38,6 +38,41 @@
             </button>
           </div>
         </div>
+        <div class="bg-white rounded-lg shadow-sm p-6 mt-4">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">价格区间</h3>
+          <div class="space-y-3">
+            <div class="flex items-center space-x-2">
+              <input
+                v-model.number="priceMin"
+                type="number"
+                placeholder="最低价"
+                class="w-0 flex-1 min-w-0 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                min="0"
+              />
+              <span class="text-gray-400 flex-shrink-0">~</span>
+              <input
+                v-model.number="priceMax"
+                type="number"
+                placeholder="最高价"
+                class="w-0 flex-1 min-w-0 px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                min="0"
+              />
+            </div>
+            <button
+              @click="applyPriceFilter"
+              class="w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              应用筛选
+            </button>
+            <button
+              v-if="priceMin !== null || priceMax !== null"
+              @click="clearPriceFilter"
+              class="w-full px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              清除筛选
+            </button>
+          </div>
+        </div>
       </div>
       <div class="col-span-9">
         <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-lg shadow-lg p-8 mb-6">
@@ -102,6 +137,10 @@ const filterCategory = ref(null)
 const filterCampus = ref(null)
 const sortBy = ref('create_time')
 const searchKeyword = ref('')
+const priceMin = ref(null)
+const priceMax = ref(null)
+const appliedPriceMin = ref(null)
+const appliedPriceMax = ref(null)
 
 onMounted(() => {
   if (route.query.keyword) {
@@ -134,6 +173,14 @@ const filteredGoods = computed(() => {
     result = result.filter(g => g.campus === filterCampus.value)
   }
 
+  if (appliedPriceMin.value !== null) {
+    result = result.filter(g => g.price >= appliedPriceMin.value)
+  }
+
+  if (appliedPriceMax.value !== null) {
+    result = result.filter(g => g.price <= appliedPriceMax.value)
+  }
+
   switch (sortBy.value) {
     case 'price_asc':
       result.sort((a, b) => a.price - b.price)
@@ -147,6 +194,18 @@ const filteredGoods = computed(() => {
 
   return result
 })
+
+const applyPriceFilter = () => {
+  appliedPriceMin.value = priceMin.value
+  appliedPriceMax.value = priceMax.value
+}
+
+const clearPriceFilter = () => {
+  priceMin.value = null
+  priceMax.value = null
+  appliedPriceMin.value = null
+  appliedPriceMax.value = null
+}
 
 const getCategoryName = (id) => categories.find(c => c.category_id === id)?.category_name || '未知分类'
 const getUserName = (id) => users.find(u => u.user_id === id)?.username || '未知用户'
